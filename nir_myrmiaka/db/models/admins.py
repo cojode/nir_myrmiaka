@@ -5,4 +5,4 @@ from sqlalchemy import ForeignKey
 class AdminModel(Base):
     __tablename__ = "admin"
     admin_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))

@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from nir_myrmiaka.db.models.users import UsersModel as User
-# from nir_myrmiaka.web.api.v1.auth.schemas.requests import UserCreateRequest, UserUpdateRequest
-# from backend.services.auth.security import hash_password
+from nir_myrmiaka.web.api.v1.auth.schemas.requests import UserCreateRequest
+# TODO from nir_myrmiaka.services.auth.security import hash_password
 
 async def get_user_by_login(db: AsyncSession, login: str) -> User | None:
     """
@@ -25,7 +25,7 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> User | None:
     :param user_id: The ID of the user to retrieve.
     :return: The User instance if found, None otherwise.
     """
-    stmt = select(User).where(User.id == user_id)
+    stmt = select(User).where(User.user_id == user_id)
     result = await db.execute(stmt)
     return result.scalars().first()
 
@@ -39,7 +39,7 @@ async def create_user(db: AsyncSession, user_in: UserCreateRequest) -> User:
     :return: The created User instance.
     """
     
-    # ! whataaaheeeeellll oooh my gaauud ?????
+    # ! whataaaheeeeellll oooh my gaauud ????? (pohui poka)
     hash_password = lambda x: str(x)[::-1]
     
     db_user = User(
