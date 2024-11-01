@@ -3,7 +3,7 @@ from sqlalchemy.future import select
 
 from nir_myrmiaka.db.models.users import UsersModel as User
 from nir_myrmiaka.web.api.v1.auth.schemas.requests import UserCreateRequest
-# TODO from nir_myrmiaka.services.auth.security import hash_password
+from nir_myrmiaka.services.auth.security import hash_password
 
 async def get_user_by_login(db: AsyncSession, login: str) -> User | None:
     """
@@ -38,9 +38,6 @@ async def create_user(db: AsyncSession, user_in: UserCreateRequest) -> User:
     :param role: The Role instance to assign to the user.
     :return: The created User instance.
     """
-    
-    # ! whataaaheeeeellll oooh my gaauud ????? (pohui poka)
-    hash_password = lambda x: str(x)[::-1]
     
     db_user = User(
         login=user_in.login,
