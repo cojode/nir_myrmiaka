@@ -5,9 +5,9 @@ from nir_myrmiaka.db.models.users import UsersModel as User
 from nir_myrmiaka.services.auth.security import verify_password
 
 
-async def authenticate_user(db: AsyncSession, login: str, password: str):
+async def authenticate_user(db: AsyncSession, username: str, password: str):
     stmt = select(User).where(
-        (User.login == login)
+        (User.username == username)
     )
     result = await db.execute(stmt)
     user = result.scalars().first()

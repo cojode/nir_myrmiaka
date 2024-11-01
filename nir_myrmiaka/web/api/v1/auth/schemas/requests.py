@@ -5,7 +5,7 @@ from nir_myrmiaka.web.api.v1.schemas import PasswordMixinSchema
 
 class UserCreateRequest(PasswordMixinSchema):
     """Schema for user creation request."""
-    login: str = Field(
+    username: str = Field(
         ...,
         min_length=3,
         max_length=30,

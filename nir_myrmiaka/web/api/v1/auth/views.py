@@ -28,9 +28,9 @@ async def register_user(
     Register new user with 201
     Unless returns 400
     """
-    existing_user_login = await get_user_by_login(db, user_in.login)
+    existing_user_login = await get_user_by_login(db, user_in.username)
     if existing_user_login:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Login already taken')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username already taken')
     return await create_user(db, user_in)
 
 @router.post("/login", summary="Authenticates a user", status_code=status.HTTP_200_OK)
