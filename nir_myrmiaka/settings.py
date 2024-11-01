@@ -30,6 +30,9 @@ class Settings(BaseSettings):
 
     host: str = "127.0.0.1"
     port: int = 8000
+    
+    api_version: str = "v1"
+    
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
