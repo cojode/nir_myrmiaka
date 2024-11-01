@@ -8,4 +8,4 @@ class TaskModel(Base):
     task_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     global_mark_id: Mapped[int] = mapped_column(ForeignKey('global_mark.global_mark_id'))
     work_id: Mapped[int] = mapped_column(ForeignKey('works.work_id'))
-    state: Mapped[Text] = mapped_column(nullable=False)
+    state: Mapped[str] = mapped_column(Text, nullable=False)

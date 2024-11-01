@@ -8,5 +8,5 @@ class WorksModel(Base):
     work_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     pz_id: Mapped[int] = mapped_column(ForeignKey('pz.pz_id'))
     rspz_id: Mapped[int] = mapped_column(ForeignKey('rspz.rspz_id'))
-    comm: Mapped[Text] = mapped_column()
+    comm: Mapped[str] = mapped_column(Text)
     mark: Mapped[str] = mapped_column(String(128))

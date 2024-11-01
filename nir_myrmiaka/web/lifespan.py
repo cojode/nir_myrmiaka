@@ -4,10 +4,10 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from backend.db.meta import meta
-from backend.db.models import load_all_models
-from backend.services.redis.lifespan import init_redis, shutdown_redis
-from backend.settings import settings
+from nir_myrmiaka.db.meta import meta
+from nir_myrmiaka.db.models import load_all_models
+from nir_myrmiaka.services.redis.lifespan import init_redis, shutdown_redis
+from nir_myrmiaka.settings import settings
 
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover

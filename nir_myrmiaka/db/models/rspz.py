@@ -5,4 +5,4 @@ from sqlalchemy.orm import Mapped, mapped_column
 class PSPZModel(Base):
     __tablename__ = "rspz"
     rspz_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    state: Mapped[Text] = mapped_column()
+    state: Mapped[str] = mapped_column(Text)

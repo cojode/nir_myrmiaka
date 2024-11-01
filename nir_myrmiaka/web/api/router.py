@@ -1,8 +1,8 @@
 from fastapi.routing import APIRouter
 
-from backend.web.api.v1 import monitoring
+from nir_myrmiaka.web.api.v1 import monitoring
 
-from backend.settings import settings
+from nir_myrmiaka.settings import settings
 
 api_router = APIRouter()
 
