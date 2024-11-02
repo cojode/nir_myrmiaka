@@ -7,5 +7,5 @@ from nir_myrmiaka.settings import settings
 api_router = APIRouter()
 
 api_router.include_router(monitoring.router)
-api_router.include_router(auth.router, prefix=f"/{settings.api_version}")
-api_router.include_router(user.router, prefix=f"/{settings.api_version}")
+api_router.include_router(auth.router, prefix=f"/{settings.api_version}/auth")
+api_router.include_router(user.router, prefix=f"/{settings.api_version}/user")

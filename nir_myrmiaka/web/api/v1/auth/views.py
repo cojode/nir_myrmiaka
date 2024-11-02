@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from nir_myrmiaka.db.dependencies import get_db_session
 from nir_myrmiaka.db.repositories.auth import (
-    authenticate_user
+    authenticate_user, create_user
 )
 from nir_myrmiaka.db.repositories.users import (
-    get_user_by_username, create_user
+    get_user_by_username
 )
 from nir_myrmiaka.web.api.v1.auth.schemas.requests import (
     UserCreateRequest
