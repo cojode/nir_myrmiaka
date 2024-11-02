@@ -9,4 +9,4 @@ class StudentModel(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     teacher_id: Mapped[int] = mapped_column(ForeignKey('teacher.teacher_id'), nullable=True)
     task_id: Mapped[int] = mapped_column(ForeignKey('task.task_id'), nullable=True)
-    number_group: Mapped[str] = mapped_column(String(128))
+    number_group: Mapped[str] = mapped_column(String(128), nullable=True)

@@ -16,7 +16,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
         return None
     return user
 
-async def create_user(db: AsyncSession, user_in: UserCreateRequest) -> User:
+async def create_user(db: AsyncSession, user_in: UserCreateRequest, extracted_status_id: int) -> User:
     """
     Create a new user.
 
@@ -28,7 +28,7 @@ async def create_user(db: AsyncSession, user_in: UserCreateRequest) -> User:
     db_user = User(
         username=user_in.username,
         password=hash_password(user_in.password),
-        status=user_in.status
+        status_id=extracted_status_id
     )
     db.add(db_user)
     await db.commit()

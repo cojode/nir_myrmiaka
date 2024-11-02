@@ -12,7 +12,6 @@ class StatusModel(Base):
 @event.listens_for(StatusModel.__table__, "after_create")
 def insert_initial_values(target, connection, **kw):
     initial_values = [{"status_id": 1, "value": "student"},
-                      {"status_id": 2, "value": "teacher"},
-                      {"status_id": 3, "value": "admin"}]
+                      {"status_id": 2, "value": "teacher"}]
 
     connection.execute(target.insert(), initial_values)

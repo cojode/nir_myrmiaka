@@ -29,7 +29,6 @@ async def get_student_by_username(db: AsyncSession, username: str) -> Student | 
             .where(User.username == username))
     result = await db.execute(stmt)
     return result.scalars().first()
-    
 
 async def update_student_from_request(db: AsyncSession, student: Student, student_in) -> Student:
     """
@@ -48,7 +47,7 @@ async def update_student_from_request(db: AsyncSession, student: Student, studen
     await db.refresh(student)
     return student
 
-async def create_student(db: AsyncSession, user_id: int, number_group: str) -> Student:
+async def create_student(db: AsyncSession, user_id: int) -> Student:
     """
     Create a new user.
 
@@ -58,8 +57,7 @@ async def create_student(db: AsyncSession, user_id: int, number_group: str) -> S
     """
     
     db_student = Student(
-        user_id=user_id,
-        number_group=number_group
+        user_id=user_id
     )
     db.add(db_student)
     await db.commit()
