@@ -36,7 +36,9 @@ async def _create_tables() -> None:  # pragma: no cover
     async with engine.begin() as connection:
         await connection.run_sync(meta.create_all)
     await engine.dispose()
-
+    
+async def _fill_status_table() -> None:
+    pass
 
 @asynccontextmanager
 async def lifespan_setup(

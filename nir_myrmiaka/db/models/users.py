@@ -1,13 +1,15 @@
 from nir_myrmiaka.db.base import Base
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
 
 class UsersModel(Base):
     __tablename__ = "users"
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(128), nullable=False)
-    status: Mapped[str] = mapped_column(String(128), nullable=False)
+    status_id: Mapped[int] = mapped_column(ForeignKey('status.status_id'), default=1)
     first_name: Mapped[str] = mapped_column(String(128), nullable=True)
     phone_number: Mapped[str] = mapped_column(String(128), nullable=True)
     mail: Mapped[str] = mapped_column(String(128), nullable=True)
+    
