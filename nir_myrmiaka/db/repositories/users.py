@@ -5,12 +5,12 @@ from nir_myrmiaka.db.models.users import UsersModel as User
 from nir_myrmiaka.web.api.v1.auth.schemas.requests import UserCreateRequest
 from nir_myrmiaka.services.auth.security import hash_password
 
-async def get_user_by_login(db: AsyncSession, username: str) -> User | None:
+async def get_user_by_username(db: AsyncSession, username: str) -> User | None:
     """
-    Get a user by login.
+    Get a user by username.
 
     :param db: The database session.
-    :param username: The login of the user to retrieve.
+    :param username: The username of the user to retrieve.
     :return: The User instance if found, None otherwise.
     """
     stmt = select(User).where(User.username == username)
@@ -35,7 +35,6 @@ async def create_user(db: AsyncSession, user_in: UserCreateRequest) -> User:
 
     :param db: The database session.
     :param user_in: The UserCreateRequest containing user details.
-    :param role: The Role instance to assign to the user.
     :return: The created User instance.
     """
     

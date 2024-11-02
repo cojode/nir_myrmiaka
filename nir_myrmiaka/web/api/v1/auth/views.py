@@ -9,7 +9,7 @@ from nir_myrmiaka.db.repositories.auth import (
     authenticate_user
 )
 from nir_myrmiaka.db.repositories.users import (
-    get_user_by_login, create_user
+    get_user_by_username, create_user
 )
 from nir_myrmiaka.web.api.v1.auth.schemas.requests import (
     UserCreateRequest
@@ -28,7 +28,7 @@ async def register_user(
     Register new user with 201
     Unless returns 400
     """
-    existing_user_login = await get_user_by_login(db, user_in.username)
+    existing_user_login = await get_user_by_username(db, user_in.username)
     if existing_user_login:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username already taken')
     return await create_user(db, user_in)
