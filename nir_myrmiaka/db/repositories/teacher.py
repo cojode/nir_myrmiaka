@@ -1,36 +1,36 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from nir_myrmiaka.db.models.student import StudentModel as Student
+from nir_myrmiaka.db.models.teacher import TeacherModel as Teacher
 from nir_myrmiaka.db.models.users import UsersModel as User
 
-async def get_student_by_user_id(db: AsyncSession, user_id: int) -> Student | None:
+async def get_teacher_by_user_id(db: AsyncSession, user_id: int) -> Teacher | None:
     """
-    Get a student by user_id.
+    Get a teacher by user_id.
 
     :param db: The database session.
     :param user_id: The user_id of the user to retrieve.
     :return: The User instance if found, None otherwise.
     """
-    stmt = select(Student).where(Student.user_id == user_id)
+    stmt = select(Teacher).where(Teacher.user_id == user_id)
     result = await db.execute(stmt)
     return result.scalars().first()
 
-async def get_student_by_username(db: AsyncSession, username: str) -> Student | None:
+async def get_teacher_by_username(db: AsyncSession, username: str) -> Teacher | None:
     """
-    Get a student by username.
+    Get a teacher by username.
 
     :param db: The database session.
     :param username: The username of the user to retrieve.
     :return: The User instance if found, None otherwise.
     """
-    stmt = (select(Student)
-            .join(User, Student.user_id == User.user_id)
+    stmt = (select(Teacher)
+            .join(User, Teacher.user_id == User.user_id)
             .where(User.username == username))
     result = await db.execute(stmt)
     return result.scalars().first()
 
-async def update_student_from_request(db: AsyncSession, student: Student, student_in) -> Student:
+async def update_teacher_from_request(db: AsyncSession, teacher: Teacher, teacher_in) -> Teacher:
     """
     Update user information.
 
@@ -39,15 +39,15 @@ async def update_student_from_request(db: AsyncSession, student: Student, studen
     :param user_in: The UserUpdateRequest containing updated details.
     :return: The updated User instance.
     """
-    for key, value in student_in.__dict__.items():
+    for key, value in teacher_in.__dict__.items():
         if value is not None:
-            setattr(student, key, value)
+            setattr(teacher, key, value)
 
     await db.commit()
-    await db.refresh(student)
-    return student
+    await db.refresh(teacher)
+    return teacher
 
-async def create_student(db: AsyncSession, user_id: int) -> Student:
+async def create_teacher(db: AsyncSession, user_id: int) -> Teacher:
     """
     Create a new user.
 
@@ -56,15 +56,15 @@ async def create_student(db: AsyncSession, user_id: int) -> Student:
     :return: The created User instance.
     """
     
-    db_student = Student(
+    db_teacher = Teacher(
         user_id=user_id
     )
-    db.add(db_student)
+    db.add(db_teacher)
     await db.commit()
-    await db.refresh(db_student)
-    return db_student
+    await db.refresh(db_teacher)
+    return db_teacher
 
-async def all_students(db: AsyncSession) -> list[Student]:
-    stmt = select(Student)
+async def all_teachers(db: AsyncSession) -> list[Teacher]:
+    stmt = select(Teacher)
     result = await db.execute(stmt)
     return list(result.scalars().all())

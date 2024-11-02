@@ -20,6 +20,10 @@ from nir_myrmiaka.db.repositories.student import (
     create_student
 )
 
+from nir_myrmiaka.db.repositories.teacher import (
+    create_teacher
+)
+
 from nir_myrmiaka.web.api.v1.auth.schemas.requests import (
     UserCreateRequest
 )
@@ -50,7 +54,7 @@ async def register_user(
         case "student":
             status_entity = await create_student(db, created_user.user_id)
         case "teacher":
-            ...
+            status_entity = await create_teacher(db, created_user.user_id)
         case _:
             pass
     return {"created_user": created_user, f"created_{user_in.status}": status_entity}
