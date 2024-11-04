@@ -39,7 +39,7 @@ class Settings(BaseSettings):
 
     log_level: LogLevel = LogLevel.INFO
     # Variables for the database
-    db_file: Path = TEMP_DIR
+    db_file: Path = TEMP_DIR / 'db.sqlite3'
     db_echo: bool = True
 
     @property
@@ -49,7 +49,7 @@ class Settings(BaseSettings):
 
         :return: database URL.
         """
-        return f"sqlite+aiosqlite:///{self.db_file}"# URL.build(scheme="sqlite+aiosqlite", path=f"///{self.db_file}")
+        return URL.build(scheme="sqlite+aiosqlite", path=f"///{self.db_file}")
 
     model_config = SettingsConfigDict(
         env_file=".env",
