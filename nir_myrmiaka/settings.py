@@ -36,6 +36,7 @@ class Settings(BaseSettings):
 
     # Current environment
     environment: str = "dev"
+    version: str = "v1"
 
     log_level: LogLevel = LogLevel.INFO
     # Variables for the database
