@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from nir_myrmiaka.db.meta import meta
 from nir_myrmiaka.db.models import load_all_models
-from nir_myrmiaka.services.redis.lifespan import init_redis, shutdown_redis
 from nir_myrmiaka.settings import settings
 
 
@@ -33,12 +32,11 @@ async def _create_tables() -> None:  # pragma: no cover
     """Populates tables in the database."""
     load_all_models()
     engine = create_async_engine(str(settings.db_url))
+    print(str(settings.db_url))
     async with engine.begin() as connection:
         await connection.run_sync(meta.create_all)
     await engine.dispose()
-    
-async def _fill_status_table() -> None:
-    pass
+
 
 @asynccontextmanager
 async def lifespan_setup(
@@ -57,10 +55,7 @@ async def lifespan_setup(
     app.middleware_stack = None
     _setup_db(app)
     await _create_tables()
-    init_redis(app)
     app.middleware_stack = app.build_middleware_stack()
 
     yield
     await app.state.db_engine.dispose()
-
-    await shutdown_redis(app)

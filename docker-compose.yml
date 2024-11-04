@@ -7,47 +7,11 @@ services:
     restart: always
     env_file:
       - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
       NIR_MYRMIAKA_HOST: 0.0.0.0
-      NIR_MYRMIAKA_DB_HOST: nir_myrmiaka-db
-      NIR_MYRMIAKA_DB_PORT: 5432
-      NIR_MYRMIAKA_DB_USER: nir_myrmiaka
-      NIR_MYRMIAKA_DB_PASS: nir_myrmiaka
-      NIR_MYRMIAKA_DB_BASE: nir_myrmiaka
-      NIR_MYRMIAKA_REDIS_HOST: nir_myrmiaka-redis
-
-  db:
-    image: postgres:16.3-bullseye
-    hostname: nir_myrmiaka-db
-    environment:
-      POSTGRES_PASSWORD: "nir_myrmiaka"
-      POSTGRES_USER: "nir_myrmiaka"
-      POSTGRES_DB: "nir_myrmiaka"
+      NIR_MYRMIAKA_DB_FILE: /db_data/db.sqlite3
     volumes:
-      - nir_myrmiaka-db-data:/var/lib/postgresql/data
-    restart: always
-    healthcheck:
-      test: pg_isready -U nir_myrmiaka
-      interval: 2s
-      timeout: 3s
-      retries: 40
-
-  redis:
-    image: bitnami/redis:6.2.5
-    hostname: "nir_myrmiaka-redis"
-    restart: always
-    environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-    healthcheck:
-      test: redis-cli ping
-      interval: 1s
-      timeout: 3s
-      retries: 50
+      - nir_myrmiaka-db-data:/db_data/
 
 
 

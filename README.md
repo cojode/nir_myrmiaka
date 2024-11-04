@@ -116,12 +116,6 @@ docker-compose down
 ```
 
 For running tests on your local machine.
-1. you need to start a database.
-
-I prefer doing it with docker:
-```
-docker run -p "5432:5432" -e "POSTGRES_PASSWORD=nir_myrmiaka" -e "POSTGRES_USER=nir_myrmiaka" -e "POSTGRES_DB=nir_myrmiaka" postgres:16.3-bullseye
-```
 
 
 2. Run the pytest.
