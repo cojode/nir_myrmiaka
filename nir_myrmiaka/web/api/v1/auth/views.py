@@ -28,3 +28,34 @@ async def register_user(
         return user
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.post("/login", status_code=status.HTTP_200_OK)
+async def login_user(
+    username: str,
+    password: str,
+    db: AsyncSession = Depends(get_db_session)
+):
+    user_service = UserService(db, 
+                               get_auth_user_repository(), 
+                               get_users_userprofile_repository())
+    
+    try:
+        await user_service.login_user(username, password)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+@router.post("/status", status_code=status.HTTP_200_OK)
+async def status_user(
+    username: str,
+    db: AsyncSession = Depends(get_db_session)
+):
+    user_service = UserService(db, 
+                               get_auth_user_repository(), 
+                               get_users_userprofile_repository())
+    
+    try:
+        status = await user_service.get_status(username)
+        return status
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
