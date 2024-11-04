@@ -23,17 +23,24 @@ class AuthUser(Base):
 
     users_userprofile: Mapped[List['UsersUserprofile']] = relationship('UsersUserprofile', uselist=True, back_populates='user')
 
-class BaseResearchwork(Base):
-    __tablename__ = 'base_researchwork'
+class UsersUserprofile(Base):
+    __tablename__ = 'users_userprofile'
+    __table_args__ = (
+        Index('users_userprofile_group_id_d32cb94c', 'group_id'),
+    )
 
     id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String(100), nullable=False)
-    description = mapped_column(Text, nullable=False)
+    user_id = mapped_column(ForeignKey('auth_user.id'), nullable=False)
+    group_id = mapped_column(ForeignKey('users_group.id'))
+    middle_name = mapped_column(String(30))
+    role = mapped_column(String(20))
 
-    base_topic: Mapped[List['BaseTopic']] = relationship('BaseTopic', uselist=True, back_populates='research_work')
-    base_submission: Mapped[List['BaseSubmission']] = relationship('BaseSubmission', uselist=True, back_populates='research_work')
+    group: Mapped[Optional['UsersGroup']] = relationship('UsersGroup', back_populates='users_userprofile')
+    user: Mapped['AuthUser'] = relationship('AuthUser', back_populates='users_userprofile')
+    base_assignment: Mapped[List['BaseAssignment']] = relationship('BaseAssignment', uselist=True, foreign_keys='[BaseAssignment.student_id]', back_populates='student')
+    base_assignment_: Mapped[List['BaseAssignment']] = relationship('BaseAssignment', uselist=True, foreign_keys='[BaseAssignment.teacher_id]', back_populates='teacher')
 
-
+    
 class UsersGroup(Base):
     __tablename__ = 'users_group'
 
@@ -54,24 +61,18 @@ class BaseTopic(Base):
 
     research_work: Mapped[Optional['BaseResearchwork']] = relationship('BaseResearchwork', back_populates='base_topic')
     base_file: Mapped[List['BaseFile']] = relationship('BaseFile', uselist=True, back_populates='topic')
+    
 
-
-class UsersUserprofile(Base):
-    __tablename__ = 'users_userprofile'
-    __table_args__ = (
-        Index('users_userprofile_group_id_d32cb94c', 'group_id'),
-    )
+class BaseResearchwork(Base):
+    __tablename__ = 'base_researchwork'
 
     id = mapped_column(Integer, primary_key=True)
-    user_id = mapped_column(ForeignKey('auth_user.id'), nullable=False)
-    group_id = mapped_column(ForeignKey('users_group.id'))
-    middle_name = mapped_column(String(30))
-    role = mapped_column(String(20))
+    name = mapped_column(String(100), nullable=False)
+    description = mapped_column(Text, nullable=False)
 
-    group: Mapped[Optional['UsersGroup']] = relationship('UsersGroup', back_populates='users_userprofile')
-    user: Mapped['AuthUser'] = relationship('AuthUser', back_populates='users_userprofile')
-    base_assignment: Mapped[List['BaseAssignment']] = relationship('BaseAssignment', uselist=True, foreign_keys='[BaseAssignment.student_id]', back_populates='student')
-    base_assignment_: Mapped[List['BaseAssignment']] = relationship('BaseAssignment', uselist=True, foreign_keys='[BaseAssignment.teacher_id]', back_populates='teacher')
+    base_topic: Mapped[List['BaseTopic']] = relationship('BaseTopic', uselist=True, back_populates='research_work')
+    base_submission: Mapped[List['BaseSubmission']] = relationship('BaseSubmission', uselist=True, back_populates='research_work')
+
 
 class BaseAssignment(Base):
     __tablename__ = 'base_assignment'
