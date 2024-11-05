@@ -1,5 +1,5 @@
-import re
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
+from typing import Optional
 
 class PasswordMixinSchema(BaseModel):
     password: str = Field(
@@ -27,6 +27,14 @@ class PasswordMixinSchema(BaseModel):
     #     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
     #         raise ValueError('Password must contain at least one special character')
     #     return value
+class RegisterEssentials(PasswordMixinSchema):
+    username: str = Field(
+        min_length=3,
+        max_length=50
+    )
+    role: Optional[str] = Field(
+        max_length=20
+    )
 
 class OkResponse(BaseModel):
     status: int = 200

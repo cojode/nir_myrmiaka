@@ -13,7 +13,7 @@ class UsersUserprofile(Base):
     user_id = mapped_column(ForeignKey('auth_user.id'), nullable=False)
     group_id = mapped_column(ForeignKey('users_group.id'))
     middle_name = mapped_column(String(30))
-    role = mapped_column(String(20))
+    role = mapped_column(String(20), nullable=False)
 
     group = relationship('UsersGroup', back_populates='users_userprofile')
     user = relationship('AuthUser', back_populates='users_userprofile')

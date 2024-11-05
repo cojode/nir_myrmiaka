@@ -32,7 +32,6 @@ async def _create_tables() -> None:  # pragma: no cover
     """Populates tables in the database."""
     load_all_models()
     engine = create_async_engine(str(settings.db_url))
-    print(str(settings.db_url))
     async with engine.begin() as connection:
         await connection.run_sync(meta.create_all)
     await engine.dispose()

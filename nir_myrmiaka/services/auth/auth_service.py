@@ -10,7 +10,7 @@ from nir_myrmiaka.db.repositories.users_userprofile import UsersUserprofileRepos
 
 from nir_myrmiaka.services.auth.security import hash_password, verify_password
 
-import datetime
+from datetime import datetime
 
 from typing import Tuple
 
@@ -30,8 +30,8 @@ class UserService:
         
         available_auth_user_keys = [
             'password', 'username', 'first_name',
-            'last_name', 'email', 'date_joined',
-            'last_login', 'is_superuser', 'is_staff', 'is_active'
+            'last_name', 'email', 'is_superuser',
+            'is_staff', 'is_active'
         ]
         
         auth_user_data = {
@@ -39,11 +39,12 @@ class UserService:
         }
         
         auth_user_data['password'] = hash_password(auth_user_data['password'])
+        auth_user_data['last_login'] = auth_user_data['date_joined'] = datetime.now()
         
         auth_user = await self.auth_user_repo.create(self.db, auth_user_data)
         
         available_users_userprofile_keys = [
-            'group_id', 'middle_name', 'role'
+            'middle_name', 'role'
         ]
         
         users_userprofile_data = {

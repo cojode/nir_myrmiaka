@@ -44,7 +44,7 @@ async def login_user(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
-@router.post("/status", status_code=status.HTTP_200_OK)
+@router.get("/status/{username}", status_code=status.HTTP_200_OK)
 async def status_user(
     username: str,
     db: AsyncSession = Depends(get_db_session)
@@ -54,8 +54,8 @@ async def status_user(
                                get_users_userprofile_repository())
     
     try:
-        status = await user_service.get_status(username)
-        return status
+        role = await user_service.get_status(username)
+        return role
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
