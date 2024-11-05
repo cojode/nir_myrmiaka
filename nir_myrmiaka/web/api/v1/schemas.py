@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 
 class PasswordMixinSchema(BaseModel):
@@ -27,14 +27,37 @@ class PasswordMixinSchema(BaseModel):
     #     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
     #         raise ValueError('Password must contain at least one special character')
     #     return value
-class RegisterEssentials(PasswordMixinSchema):
+class UsernameField(BaseModel):
     username: str = Field(
         min_length=3,
         max_length=50
-    )
+    )   
+
+class RegisterEssentials(PasswordMixinSchema, UsernameField):
     role: Optional[str] = Field(
         max_length=20
     )
+    
+class UserUpdateRequest(UsernameField):
+    first_name: Optional[str] = Field(
+        None,
+        max_length=150
+    )
+    last_name: Optional[str] = Field(
+        None,
+        max_length=150
+    )
+    email: Optional[EmailStr] = Field(
+        None,
+        max_length=254
+    )
+    middle_name: Optional[str] = Field(
+        None,
+        max_length=30
+    )
+    group_id: Optional[int] = Field(
+        None
+    )
 
-class OkResponse(BaseModel):
-    status: int = 200
+class UserCreateRequest(RegisterEssentials, UserUpdateRequest):
+    ...

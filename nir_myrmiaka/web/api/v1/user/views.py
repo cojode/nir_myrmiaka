@@ -6,9 +6,7 @@ from nir_myrmiaka.db.dependencies import (
     get_db_session, get_auth_user_repository, get_users_userprofile_repository
 )
 from nir_myrmiaka.services.auth.auth_service import UserService
-from nir_myrmiaka.web.api.v1.auth.schemas.requests import UserCreateRequest
-
-
+from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
 
 from nir_myrmiaka.settings import settings
 
@@ -43,4 +41,20 @@ async def status_user(
         return role
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.post("/set-info", status_code=status.HTTP_200_OK)
+async def status_user(
+    payload: UserUpdateRequest,
+    db: AsyncSession = Depends(get_db_session)
+):
+    user_service = UserService(db, 
+                               get_auth_user_repository(), 
+                               get_users_userprofile_repository())
     
+    try:
+        await user_service.set_user_info(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    
+

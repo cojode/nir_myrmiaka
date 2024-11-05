@@ -6,7 +6,7 @@ from nir_myrmiaka.db.dependencies import (
     get_db_session, get_auth_user_repository, get_users_userprofile_repository
 )
 from nir_myrmiaka.services.auth.auth_service import UserService
-from nir_myrmiaka.web.api.v1.auth.schemas.requests import UserCreateRequest
+from nir_myrmiaka.web.api.v1.schemas import UserCreateRequest
 
 
 
