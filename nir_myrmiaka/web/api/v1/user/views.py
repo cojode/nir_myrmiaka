@@ -13,7 +13,7 @@ from nir_myrmiaka.settings import settings
 router = APIRouter()
 
 @router.get("/{username}/info", status_code=status.HTTP_201_CREATED)
-async def register_user(
+async def get_info_user(
     username: str,
     db: AsyncSession = Depends(get_db_session)
 ):
