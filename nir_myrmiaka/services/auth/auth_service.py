@@ -58,7 +58,7 @@ class UserService:
         return (auth_user, users_userprofile)
     
     async def login_user(self, username: str, password: str):
-        async def authenticate_user(db, username_or_email: str, password: str):
+        async def authenticate_user(db, username: str, password: str):
             """Inner logic of authentication."""
             user = await self.auth_user_repo.read(db, {'username': username})
             if user and verify_password(password, user.password):
@@ -72,14 +72,27 @@ class UserService:
         
         user.last_login = datetime.now()
         await self.db.commit()
-    
-    async def get_status(self, username: str) -> str:
-        existing_user = await self.auth_user_repo.read(self.db, {'username': username})
-        if not existing_user:
+        
+    async def _extract_existing_data_from_username(self, username: str) -> Tuple[AuthUser, UsersUserprofile]:
+        existing_auth_user = await self.auth_user_repo.read(self.db, {'username': username})
+        if not existing_auth_user:
             raise ValueError('User with that username does not exist')
-        existing_userprofile = await self.users_userprofile_repo.read(self.db, {'user_id': existing_user.id})
+        existing_userprofile = await self.users_userprofile_repo.read(self.db, {'user_id': existing_auth_user.id})
         if not existing_userprofile:
             raise ValueError('User profile does not found')
-        return existing_userprofile.role
+        return (existing_auth_user, existing_userprofile)
+    
+    async def get_status(self, username: str) -> str:
+        _, existing_userprofile = await self._extract_existing_data_from_username(username)
+        return {'status': existing_userprofile.role}
         
-        
+    async def get_user_info(self, username: str) -> str:
+        existing_auth_user, existing_userprofile = await self._extract_existing_data_from_username(username)
+        return {
+            'username': username, 
+            'email': existing_auth_user.email, 
+            'first_name': existing_auth_user.first_name, 
+            'last_name': existing_auth_user.last_name, 
+            'middle_name': existing_userprofile.middle_name,
+            'group': existing_userprofile.group_id
+        }
