@@ -28,7 +28,7 @@ async def register_user(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 @router.get("/{username}/status", status_code=status.HTTP_200_OK)
-async def status_user(
+async def get_status_user(
     username: str,
     db: AsyncSession = Depends(get_db_session)
 ):
@@ -43,7 +43,7 @@ async def status_user(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 @router.post("/set-info", status_code=status.HTTP_200_OK)
-async def status_user(
+async def set_status_user(
     payload: UserUpdateRequest,
     db: AsyncSession = Depends(get_db_session)
 ):
