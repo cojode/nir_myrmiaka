@@ -17,9 +17,7 @@ async def get_info_user(
     username: str,
     db: AsyncSession = Depends(get_db_session)
 ):
-    user_service = UserService(db, 
-                               get_auth_user_repository(), 
-                               get_users_userprofile_repository())
+    user_service = UserService(db)
     
     try:
         info = await user_service.get_user_info(username)
@@ -32,9 +30,7 @@ async def get_status_user(
     username: str,
     db: AsyncSession = Depends(get_db_session)
 ):
-    user_service = UserService(db, 
-                               get_auth_user_repository(), 
-                               get_users_userprofile_repository())
+    user_service = UserService(db)
     
     try:
         role = await user_service.get_status(username)
@@ -47,9 +43,7 @@ async def set_status_user(
     payload: UserUpdateRequest,
     db: AsyncSession = Depends(get_db_session)
 ):
-    user_service = UserService(db, 
-                               get_auth_user_repository(), 
-                               get_users_userprofile_repository())
+    user_service = UserService(db)
     
     try:
         await user_service.set_user_info(payload)

@@ -15,20 +15,17 @@ from datetime import datetime
 from typing import Tuple
 
 class UserService:
-    def __init__(self, 
-                 db: AsyncSession, 
-                 auth_user_repo: AuthUserRepository, 
-                 users_userpofile_repo: UsersUserprofileRepository):
+    def __init__(self, db: AsyncSession):
         self.db = db
-        self.auth_user_repo = auth_user_repo
-        self.users_userprofile_repo = users_userpofile_repo
+        self.auth_user_repo = AuthUserRepository(session=db)
+        self.users_userprofile_repo = UsersUserprofileRepository(session=db)
     
     @staticmethod
     def _extract_from_payload(payload, *args):
         return {key: payload.__getattribute__(key) for key in args}
     
     async def register_user(self, payload: UserCreateRequest) -> Tuple[AuthUser, UsersUserprofile]:
-        existing_user = await self.auth_user_repo.read(self.db, {'username': payload.username})
+        existing_user = await self.auth_user_repo.find_one(username=payload.username)
         if existing_user:
             raise ValueError('Username already taken')
         
@@ -44,7 +41,7 @@ class UserService:
         auth_user_data['password'] = hash_password(auth_user_data['password'])
         auth_user_data['last_login'] = auth_user_data['date_joined'] = datetime.now()
         
-        auth_user = await self.auth_user_repo.create(self.db, auth_user_data) 
+        auth_user = await self.auth_user_repo.create(**auth_user_data) 
         
         users_userprofile_data = self._extract_from_payload(
             payload, 
@@ -53,14 +50,14 @@ class UserService:
         )        
         users_userprofile_data['user_id'] = auth_user.id
         
-        users_userprofile = await self.users_userprofile_repo.create(self.db, users_userprofile_data)
+        users_userprofile = await self.users_userprofile_repo.create(**users_userprofile_data)
         
         return (auth_user, users_userprofile)
     
     async def login_user(self, username: str, password: str):
-        async def authenticate_user(db, username: str, password: str):
+        async def authenticate_user(db, username: str, password: str) -> AuthUser | None:
             """Inner logic of authentication."""
-            user = await self.auth_user_repo.read(db, {'username': username})
+            user = await self.auth_user_repo.find_one(username=username)
             if user and verify_password(password, user.password):
                 return user
             return None
@@ -74,10 +71,10 @@ class UserService:
         await self.db.commit()
         
     async def _extract_existing_data_from_username(self, username: str) -> Tuple[AuthUser, UsersUserprofile]:
-        existing_auth_user = await self.auth_user_repo.read(self.db, {'username': username})
+        existing_auth_user = await self.auth_user_repo.find_one(username=username)
         if not existing_auth_user:
             raise ValueError('User with that username does not exist')
-        existing_userprofile = await self.users_userprofile_repo.read(self.db, {'user_id': existing_auth_user.id})
+        existing_userprofile = await self.users_userprofile_repo.find_one(user_id=existing_auth_user.id)
         if not existing_userprofile:
             raise ValueError('User profile does not found')
         return (existing_auth_user, existing_userprofile)
@@ -99,13 +96,6 @@ class UserService:
     
     async def set_user_info(self, payload: UserUpdateRequest):
         existing_auth_user, existing_userprofile = await self._extract_existing_data_from_username(payload.username)
-        await self.auth_user_repo.update(self.db, existing_auth_user.id, 
-                                   {'first_name': payload.first_name,
-                                    'last_name': payload.last_name,
-                                    'email': payload.email}
-                                   )
-        await self.users_userprofile_repo.update(self.db, existing_userprofile.id,
-                                                 {'middle_name': payload.middle_name,
-                                                  'group_id': payload.group_id}
-                                                 )
+        await self.auth_user_repo.update_by_filter({'first_name': payload.first_name, 'last_name': payload.last_name, 'email': payload.email}, id=existing_auth_user.id)
+        await self.users_userprofile_repo.update_by_filter({'middle_name': payload.middle_name, 'group_id': payload.group_id}, id=existing_userprofile.id)
         

@@ -19,9 +19,7 @@ async def register_user(
     payload: UserCreateRequest,
     db: AsyncSession = Depends(get_db_session)
 ):
-    user_service = UserService(db, 
-                               get_auth_user_repository(), 
-                               get_users_userprofile_repository())
+    user_service = UserService(db)
     
     try:
         user = await user_service.register_user(payload)
@@ -35,9 +33,7 @@ async def login_user(
     password: str,
     db: AsyncSession = Depends(get_db_session)
 ):
-    user_service = UserService(db, 
-                               get_auth_user_repository(), 
-                               get_users_userprofile_repository())
+    user_service = UserService(db)
     
     try:
         await user_service.login_user(username, password)
