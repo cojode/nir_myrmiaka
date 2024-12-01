@@ -1,14 +1,11 @@
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Type, TypeVar, List, Optional, Any, Dict, Generic
-from sqlalchemy import select as sql_select, update as sql_update, delete as sql_delete
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
-from nir_myrmiaka.db.repositories.crud.query_builder import QueryBuilder
+from sqlalchemy import select as sql_select, update as sql_update, delete as sql_delete, Select
+from sqlalchemy.exc import SQLAlchemyError
 
+from nir_myrmiaka.db.database import Database
 from nir_myrmiaka.db.repositories.crud.exc import (
     RepositoryError,
-    UniqueConstraintViolationError,
 )
 
 T = TypeVar("T")
@@ -30,13 +27,14 @@ class AbstractCRUDRepository(ABC, Generic[T]):
 
     @abstractmethod
     async def read(
-        self, builder: Optional["QueryBuilder"] = None, only_first=False
+        self, only_first=False, limit: Optional[int] = None, 
+        offset: Optional[int] = None, order_by=None, **filters: Any
     ) -> List[T]:
         """
         Reads entities with an optional QueryBuilder for custom filtering.
         By default reads all entries, alter only_first flag to read only first entry.
 
-        :param builder: Optional QueryBuilder instance for building complex query conditions.
+
         :return: List of entities matching the conditions.
         :raises RepositoryError: If the read operation fails.
         """
@@ -44,12 +42,12 @@ class AbstractCRUDRepository(ABC, Generic[T]):
 
     @abstractmethod
     async def update(
-        self, builder: Optional["QueryBuilder"] = None, **kwargs: Any
+        self, fields: Dict[str, Any], **filters: Any
     ) -> int:
         """
         Updates entities based on conditions set in QueryBuilder and specified fields.
 
-        :param builder: Optional QueryBuilder instance for building complex query conditions.
+
         :param fields: Fields to update in the matching entities.
         :return: Number of rows affected by the update.
         :raises ValueError: If no fields are provided for updating.
@@ -58,11 +56,11 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def delete(self, builder: Optional["QueryBuilder"] = None) -> int:
+    async def delete(self, entity: Optional[T] = None, **filters: Any) -> int:
         """
         Deletes entities based on conditions set in QueryBuilder.
 
-        :param builder: Optional QueryBuilder instance for building complex query conditions.
+
         :return: Number of rows affected by the delete operation.
         :raises RepositoryError: If the delete operation fails.
         """
@@ -79,78 +77,91 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         """
         pass
 
+T = TypeVar("T")
 
-@dataclass
 class CRUDRepository(AbstractCRUDRepository[T]):
-    session: AsyncSession
-    model: Type[T]
+    def __init__(self, database: Database, model: Type[T]):
+        self.database = database
+        self.model = model
 
     async def create(self, entity: Optional[T] = None, **kwargs: Any) -> T:
         try:
-            async with self.session as session:
-                instance = entity if entity else self.model(**kwargs)
+            instance = entity if entity else self.model(**kwargs)
+            async with self.database.get_session() as session:
                 session.add(instance)
-                await session.commit()
-                await session.refresh(instance)
-            return instance
-        except IntegrityError as e:
-            raise UniqueConstraintViolationError(
-                f"Duplicate entry or unique constraint violated: {e}"
-            ) from e
+                await session.flush([instance])
+                return instance
         except SQLAlchemyError as e:
-            raise RepositoryError(f"Failed to create entity: \nentity={entity}, \nkwargs={kwargs} \n SQLAlchemyError: {e}") from e
+            raise RepositoryError(f"Failed to create entity: {e}") from e
 
     async def read(
-        self, builder: Optional[QueryBuilder] = None, only_first=False
+        self, only_first=False, raw_query: Select = None, limit: Optional[int] = None, 
+        offset: Optional[int] = None, order_by=None, **filters: Any
     ) -> List[T]:
+        """
+        Reads entities with optional filters, pagination, and ordering.
+        """
         try:
-            async with self.session as session:
-                query = (
-                    builder.apply_to(sql_select(self.model))
-                    if builder
-                    else sql_select(self.model)
-                )
+            query = sql_select(self.model).filter_by(**filters)
+            if order_by is not None:
+                query = query.order_by(order_by)
+            if limit is not None:
+                query = query.limit(limit)
+            if offset is not None:
+                query = query.offset(offset)
+            
+            if raw_query is not None:
+                query = raw_query
+
+            async with self.database.get_read_only_session() as session:
                 result = await session.execute(query)
                 result_scalars = result.scalars()
                 return result_scalars.first() if only_first else result_scalars.all()
-        except SQLAlchemyError as e:
-            raise RepositoryError("Failed to read entities") from e
 
-    async def update(
-        self, builder: Optional[QueryBuilder] = None, **fields: Dict[str, Any]
-    ) -> int:
+        except SQLAlchemyError as e:
+            raise RepositoryError(f"Failed to read entities: {e}") from e
+
+    async def update(self, fields: Dict[str, Any], **filters: Any) -> int:
+        """
+        Updates entities based on conditions provided in filters and fields to update.
+        """
         if not fields:
             raise ValueError("No fields provided to update")
-
         try:
-            async with self.session as session:
-                query = sql_update(self.model).values(**fields)
-                if builder:
-                    query = builder.apply_to(query)
+            async with self.database.get_session() as session:
+                query = sql_update(self.model).values(**fields).filter_by(**filters)
                 result = await session.execute(query)
                 await session.commit()
                 return result.rowcount
         except SQLAlchemyError as e:
-            raise RepositoryError("Failed to update entities") from e
+            raise RepositoryError(f"Failed to update entities: {e}") from e
 
-    async def delete(self, builder: Optional[QueryBuilder] = None) -> int:
+    async def delete(self, entity: Optional[T] = None, **filters: Any) -> int:
+        """
+        Deletes entities based on conditions set in filters.
+        """
         try:
-            async with self.session as session:
-                query = sql_delete(self.model)
-                if builder:
-                    query = builder.apply_to(query)
+            async with self.database.get_session() as session:
+                if entity is not None:
+                    await session.delete(entity)
+                    return 1
+                
+                query = sql_delete(self.model).filter_by(**filters)
                 result = await session.execute(query)
                 await session.commit()
                 return result.rowcount
         except SQLAlchemyError as e:
-            raise RepositoryError("Failed to delete entities") from e
+            raise RepositoryError(f"Failed to delete entities: {e}") from e
 
     async def save(self, entity: T) -> T:
+        """
+        Saves (inserts or updates) the provided entity in the database.
+        """
         try:
-            async with self.session.get_session() as session:
+            async with self.database.get_session() as session:
                 session.add(entity)
                 await session.flush()
                 await session.refresh(entity)
-            return entity
+                return entity
         except SQLAlchemyError as e:
-            raise RepositoryError("Failed to save entity") from e
+            raise RepositoryError(f"Failed to save entity: {e}") from e

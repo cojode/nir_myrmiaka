@@ -11,7 +11,7 @@ class Database:
             url=url,
             pool_pre_ping=False,
             # echo=False,
-            isolation_level="READ COMMITTED",
+            isolation_level="AUTOCOMMIT",
         )
         self._async_session = async_sessionmaker(
             bind=self._async_engine,

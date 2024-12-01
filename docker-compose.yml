@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: ./Dockerfile
     image: nir_myrmiaka:${NIR_MYRMIAKA_VERSION:-latest}
-    restart: always
     env_file:
       - .env
     environment:

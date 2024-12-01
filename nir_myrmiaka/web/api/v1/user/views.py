@@ -1,23 +1,19 @@
-from fastapi import APIRouter, HTTPException, Depends, status, Request
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, Depends, status
 
-from nir_myrmiaka.db.dependencies import (
-    get_db_session, get_auth_user_repository, get_users_userprofile_repository
-)
+from punq import Container
+from nir_myrmiaka.container.container import init_container
+
 from nir_myrmiaka.services.auth.auth_service import UserService
 from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
-
-from nir_myrmiaka.settings import settings
 
 router = APIRouter()
 
 @router.get("/{username}/info", status_code=status.HTTP_201_CREATED)
 async def get_info_user(
     username: str,
-    db: AsyncSession = Depends(get_db_session)
+    container: Container = Depends(init_container)
 ):
-    user_service = UserService(db)
+    user_service: UserService = container.resolve(UserService)
     
     try:
         info = await user_service.get_user_info(username)
@@ -28,9 +24,9 @@ async def get_info_user(
 @router.get("/{username}/status", status_code=status.HTTP_200_OK)
 async def get_status_user(
     username: str,
-    db: AsyncSession = Depends(get_db_session)
+    container: Container = Depends(init_container)
 ):
-    user_service = UserService(db)
+    user_service: UserService = container.resolve(UserService)
     
     try:
         role = await user_service.get_status(username)
@@ -41,14 +37,24 @@ async def get_status_user(
 @router.post("/set-info", status_code=status.HTTP_200_OK)
 async def set_status_user(
     payload: UserUpdateRequest,
-    db: AsyncSession = Depends(get_db_session)
+    container: Container = Depends(init_container)
 ):
-    user_service = UserService(db)
+    user_service = container.resolve(UserService)
     
     try:
         await user_service.set_user_info(payload)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.post("/all-teachers", status_code=status.HTTP_200_OK)
+async def get_all_teachers(container: Container = Depends(init_container)):
+    user_service: UserService = container.resolve(UserService)
+    
+    try:
+        return await user_service.get_all_teachers()
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
 
     
 

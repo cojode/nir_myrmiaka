@@ -10,12 +10,14 @@ from nir_myrmiaka.db.repositories.users_userprofile import UsersUserprofileRepos
 
 from nir_myrmiaka.services.auth.security import hash_password, verify_password
 
+from nir_myrmiaka.db.database import Database
+
 from datetime import datetime
 
 from typing import Tuple
 
 class UserService:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: Database):
         self.db = db
         self.auth_user_repo = AuthUserRepository(session=db)
         self.users_userprofile_repo = UsersUserprofileRepository(session=db)
@@ -29,12 +31,11 @@ class UserService:
         if existing_user:
             raise ValueError('Username already taken')
         
-        auth_user_data = self._extract_from_payload(
-            payload, 
-            'password', 
-            'username', 
+        auth_user_data = self._extract_from_payload(payload, 
+            'password',
+            'username',
             'first_name',
-            'last_name', 
+            'last_name',
             'email'
         )
         
@@ -93,6 +94,9 @@ class UserService:
             'middle_name': existing_userprofile.middle_name,
             'group': existing_userprofile.group_id
         }
+        
+    async def get_all_teachers(self):
+        return await self.users_userprofile_repo.find_and_count(role='Teacher')
     
     async def set_user_info(self, payload: UserUpdateRequest):
         existing_auth_user, existing_userprofile = await self._extract_existing_data_from_username(payload.username)

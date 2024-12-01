@@ -9,24 +9,6 @@ class PasswordMixinSchema(BaseModel):
         description="Password must be at least 8 characters long.",
     )
 
-    # @field_validator('password')
-    # def validate_password(cls, value):
-    #     """
-    #     Validate the password complexity:
-    #     - At least one uppercase letter
-    #     - At least one lowercase letter
-    #     - At least one digit
-    #     - At least one special character
-    #     """
-    #     if not re.search(r'[A-Z]', value):
-    #         raise ValueError('Password must contain at least one uppercase letter')
-    #     if not re.search(r'[a-z]', value):
-    #         raise ValueError('Password must contain at least one lowercase letter')
-    #     if not re.search(r'[0-9]', value):
-    #         raise ValueError('Password must contain at least one digit')
-    #     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
-    #         raise ValueError('Password must contain at least one special character')
-    #     return value
 class UsernameField(BaseModel):
     username: str = Field(
         min_length=3,
@@ -61,3 +43,9 @@ class UserUpdateRequest(UsernameField):
 
 class UserCreateRequest(RegisterEssentials, UserUpdateRequest):
     ...
+    
+
+class AssignmentCreateRequest(BaseModel):
+    student_id: int = Field(None)
+    teacher_id: int = Field(None)
+    text: str = Field(None)
