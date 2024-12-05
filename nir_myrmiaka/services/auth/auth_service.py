@@ -69,7 +69,7 @@ class UserService:
             raise ValueError("Invalid credentials")
         
         user.last_login = datetime.now()
-        await self.db.commit()
+        self.auth_user_repo.save(user)
         
     async def _extract_existing_data_from_username(self, username: str) -> Tuple[AuthUser, UsersUserprofile]:
         existing_auth_user = await self.auth_user_repo.find_one(username=username)
