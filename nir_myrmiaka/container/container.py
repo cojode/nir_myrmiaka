@@ -50,7 +50,7 @@ def _init_container() -> Container:
             ro_url=str(settings.db_url),
         ),
     )
-    
+
     container.register(UserService, scope=Scope.singleton)
     container.register(WorkManagementService, scope=Scope.singleton)
 

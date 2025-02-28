@@ -3,8 +3,9 @@ from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base
 
+
 class AuthUser(Base):
-    __tablename__ = 'auth_user'
+    __tablename__ = "auth_user"
 
     id = mapped_column(Integer, primary_key=True)
     password = mapped_column(String(128), nullable=False)
@@ -15,4 +16,6 @@ class AuthUser(Base):
     first_name = mapped_column(String(150))
     last_login = mapped_column(DateTime)
 
-    users_userprofile = relationship('UsersUserprofile', uselist=True, back_populates='user')
+    users_userprofile = relationship(
+        "UsersUserprofile", uselist=True, back_populates="user"
+    )
