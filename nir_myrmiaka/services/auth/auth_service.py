@@ -97,7 +97,7 @@ class UserService:
             "group": existing_userprofile.group_id,
         }
 
-    async def get_all_teachers(self):
+    async def get_all_teachers(self) -> tuple[int, list[UsersUserprofile]]:
         return await self.users_userprofile_repo.find_and_count(role="Teacher")
 
     async def set_user_info(self, payload):

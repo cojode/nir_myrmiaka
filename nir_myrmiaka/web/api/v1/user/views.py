@@ -23,7 +23,6 @@ async def get_info_user(username: str, container: Container = Depends(init_conta
 
     try:
         info = await user_service.get_user_info(username)
-        print(info)
         return InfoResponse(data=info)
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -53,7 +52,7 @@ async def set_status_user(
     user_service = container.resolve(UserService)
 
     try:
-        await user_service.set_user_info(payload)
+        return await user_service.set_user_info(payload)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -61,12 +60,13 @@ async def set_status_user(
 @router.post(
     "/all-teachers",
     status_code=status.HTTP_200_OK,
+    response_model=AllTeachersResponse,
 )
 async def get_all_teachers(container: Container = Depends(init_container)):
     user_service: UserService = container.resolve(UserService)
 
     try:
-        data = await user_service.get_all_teachers()
-        return data
+        count, values = await user_service.get_all_teachers()
+        return AllTeachersResponse(count=count, values=values)
     except ValueError as e:
         raise_http_error_from_exception(e)

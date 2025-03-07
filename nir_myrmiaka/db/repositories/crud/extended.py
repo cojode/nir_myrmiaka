@@ -35,7 +35,7 @@ class ExtendedCRUDRepository(CRUDRepository[T]):
 
     async def find_and_count(self, **filters) -> dict:
         values = await self.find_all(**filters)
-        return {"values": values, "count": len(values)}
+        return len(values), values
 
     async def find_with_pagination(
         self, page: int = 1, per_page: int = 10, **filters

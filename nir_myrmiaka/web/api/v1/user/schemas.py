@@ -1,4 +1,7 @@
-from nir_myrmiaka.web.api.v1.schemas import GenericResponse, DictResponse
+from nir_myrmiaka.web.api.v1.schemas import (
+    GenericResponse,
+    GenericListResponse,
+)
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
@@ -22,7 +25,13 @@ class StatusResponseModel(BaseModel):
 class StatusResponse(GenericResponse[StatusResponseModel]): ...
 
 
-class AllTeachersResponseModel(BaseModel): ...
+class AllTeachersResponseModel(BaseModel):
+    user_id: int
+    role: str
+    middle_name: str
+
+    class Config:
+        from_attributes = True
 
 
-class AllTeachersResponse(DictResponse): ...
+class AllTeachersResponse(GenericListResponse[AllTeachersResponseModel]): ...

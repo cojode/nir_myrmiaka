@@ -13,7 +13,10 @@ class GenericResponse(BaseModel, Generic[T]):
     data: Optional[T]
 
 
-class DictResponse(GenericResponse[dict]): ...
+class GenericListResponse(BaseModel, Generic[T]):
+    msg: str = Field(default="success", example="success")
+    count: int
+    values: list[T]
 
 
 class UsernameField(BaseModel):

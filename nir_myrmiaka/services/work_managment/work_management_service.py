@@ -50,7 +50,7 @@ class WorkManagementService:
         self.verify_exists_and_role_specified(teacher_id, "Teacher")
         return await self.base_assignment_repo.find_and_count(teacher_id=teacher_id)
 
-    async def accept_assignment(self, teacher_id, semestr, assignment_id):
+    async def accept_assignment(self, teacher_id, semester, assignment_id):
         self.verify_exists_and_role_specified(teacher_id, "Teacher")
         target_base_assignment: BaseAssignment = (
             await self.base_assignment_repo.find_by_id(assignment_id)
@@ -65,11 +65,9 @@ class WorkManagementService:
         await self.base_assignment_repo.save(target_base_assignment)
 
         return await self.base_submission_repo.create(
-            {
-                "assignment_id": target_base_assignment["id"],
-                "semestr": semestr,
-                "created_at": datetime.now(),
-            }
+            assignment_id=assignment_id,
+            semester=semester,
+            created_at=datetime.now(),
         )
 
     async def decline_assignment(self, teacher_id, assignment_id):
@@ -84,4 +82,4 @@ class WorkManagementService:
         target_base_assignment.is_reviewed = True
         target_base_assignment.is_accepted = False
 
-        await self.base_assignment_repo.save(target_base_assignment)
+        return await self.base_assignment_repo.save(target_base_assignment)

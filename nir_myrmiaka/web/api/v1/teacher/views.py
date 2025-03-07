@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, status
 
 from punq import Container
 from nir_myrmiaka.container.container import init_container
@@ -7,10 +7,22 @@ from nir_myrmiaka.services.work_managment.work_management_service import (
     WorkManagementService,
 )
 
+from .schemas import (
+    BrowseAssignmentsResponse,
+    AcceptAssignmentResponse,
+    DeclineAssignmentResponse,
+)
+
+from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
+
 router = APIRouter()
 
 
-@router.get("/browse-assignments", status_code=status.HTTP_201_CREATED)
+@router.get(
+    "/browse-assignments",
+    status_code=status.HTTP_200_OK,
+    response_model=BrowseAssignmentsResponse,
+)
 async def browse_assignments(
     teacher_id: int, container: Container = Depends(init_container)
 ):
@@ -19,15 +31,22 @@ async def browse_assignments(
     )
 
     try:
-        return await work_management_service.browse_assignments(teacher_id)
+        count, values = await work_management_service.browse_assignments(
+            teacher_id
+        )
+        return BrowseAssignmentsResponse(count=count, values=values)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise_http_error_from_exception(e)
 
 
-@router.post("/accept_assignment", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/accept_assignment",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AcceptAssignmentResponse,
+)
 async def accept_assignment(
     teacher_id: int,
-    semestr: int,
+    semester: int,
     assignment_id: int,
     container: Container = Depends(init_container),
 ):
@@ -36,24 +55,32 @@ async def accept_assignment(
     )
 
     try:
-        return await work_management_service.accept_assignment(
-            teacher_id, semestr, assignment_id
+        data = await work_management_service.accept_assignment(
+            teacher_id, semester, assignment_id
         )
+        return AcceptAssignmentResponse(data=data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise_http_error_from_exception(e)
 
 
-@router.post("/decline_assignment", status_code=status.HTTP_201_CREATED)
-async def accept_assignment(
-    teacher_id: int, assignment_id: int, container: Container = Depends(init_container)
+@router.patch(
+    "/decline_assignment",
+    status_code=status.HTTP_200_OK,
+    response_model=DeclineAssignmentResponse,
+)
+async def decline_assignment(
+    teacher_id: int,
+    assignment_id: int,
+    container: Container = Depends(init_container),
 ):
     work_management_service: WorkManagementService = container.resolve(
         WorkManagementService
     )
 
     try:
-        return await work_management_service.decline_assignment(
+        data = await work_management_service.decline_assignment(
             teacher_id, assignment_id
         )
+        return DeclineAssignmentResponse(data=data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise_http_error_from_exception(e)
