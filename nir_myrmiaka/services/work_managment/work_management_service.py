@@ -46,7 +46,10 @@ class WorkManagementService:
         new_assignment_data["is_reviewed"] = False
         return await self.base_assignment_repo.create(**new_assignment_data)
 
-    async def browse_assignments(self, teacher_id):
+    async def get_assignment(self, assignment_id: int):
+        return await self.base_assignment_repo.find_by_id(assignment_id)
+
+    async def browse_assignments(self, teacher_id: int):
         self.verify_exists_and_role_specified(teacher_id, "Teacher")
         return await self.base_assignment_repo.find_and_count(teacher_id=teacher_id)
 

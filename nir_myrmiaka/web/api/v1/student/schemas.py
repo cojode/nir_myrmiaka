@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from nir_myrmiaka.web.api.v1.schemas import GenericResponse
+
+from typing import Optional
 
 import datetime
 
@@ -21,3 +23,23 @@ class AssignmentResponseModel(BaseModel):
 
 
 class AssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
+
+
+class StatusAssignmentModel(BaseModel):
+    is_accepted: Optional[bool]
+    is_reviewed: Optional[bool]
+
+    @computed_field
+    @property
+    def status(self) -> str:
+        if not self.is_reviewed:
+            return "Не просмотрено"
+        if not self.is_accepted:
+            return "Отказано"
+        return "Принято"
+
+    class Config:
+        from_attributes = True
+
+
+class StatusAssignmentResponse(GenericResponse[StatusAssignmentModel]): ...

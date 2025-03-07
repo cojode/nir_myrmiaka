@@ -33,3 +33,6 @@ class AuthUserResponseModel(BaseModel):
 
 
 class RegisterResponse(GenericResponse[AuthUserResponseModel]): ...
+
+
+class LoginResponse(GenericResponse[AuthUserResponseModel]): ...
