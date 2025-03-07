@@ -9,7 +9,6 @@ from nir_myrmiaka.services.work_managment.work_management_service import (
 from .schemas import (
     AssignmentCreateRequest,
     AssignmentResponse,
-    StatusAssignmentResponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
@@ -31,24 +30,5 @@ async def create_assignment(
         info = await work_management_service.create_assignment(payload)
         print(info)
         return AssignmentResponse(data=info)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
-
-
-@router.get(
-    "/status_assignment",
-    status_code=status.HTTP_200_OK,
-    response_model=StatusAssignmentResponse,
-)
-async def status_assignment(
-    assignment_id: int,
-    container: Container = Depends(init_container),
-):
-    work_management_service: WorkManagementService = container.resolve(
-        WorkManagementService
-    )
-    try:
-        data = await work_management_service.get_assignment(assignment_id)
-        return StatusAssignmentResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)

@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, computed_field
 from typing import Optional, TypeVar, Generic
+import datetime
 
 T = TypeVar("T")
 
@@ -17,6 +18,36 @@ class GenericListResponse(BaseModel, Generic[T]):
     msg: str = Field(default="success", example="success")
     count: int
     values: list[T]
+
+
+class ComputedAssignmentStatus(BaseModel):
+    @computed_field
+    @property
+    def status(self) -> str:
+        if not self.is_reviewed:
+            return "Не просмотрено"
+        if not self.is_accepted:
+            return "Отказано"
+        return "Принято"
+
+    class Config:
+        from_attributes = True
+
+
+class AssignmentResponseModel(BaseModel):
+    id: int
+    text: str
+    is_accepted: bool
+    is_reviewed: bool
+    created_at: datetime.datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AssignmentWithStatusResponseModel(
+    AssignmentResponseModel, ComputedAssignmentStatus
+): ...
 
 
 class UsernameField(BaseModel):

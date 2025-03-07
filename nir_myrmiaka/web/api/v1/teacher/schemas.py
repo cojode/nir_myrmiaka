@@ -1,22 +1,11 @@
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     GenericListResponse,
+    AssignmentWithStatusResponseModel,
 )
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel
 from typing import Optional
 import datetime
-
-
-class AssignmentResponseModel(BaseModel):
-    id: int
-    created_at: datetime.datetime
-    text: str
-    is_accepted: bool
-    is_reviewed: bool
-
-    class Config:
-        from_attributes = True
-
 
 class BaseSubmissionResponseModel(BaseModel):
     id: int
@@ -34,9 +23,11 @@ class AcceptAssignmentResponse(
 ): ...
 
 
-class DeclineAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
+class DeclineAssignmentResponse(
+    GenericResponse[AssignmentWithStatusResponseModel]
+): ...
 
 
 class BrowseAssignmentsResponse(
-    GenericListResponse[AssignmentResponseModel]
+    GenericListResponse[AssignmentWithStatusResponseModel]
 ): ...
