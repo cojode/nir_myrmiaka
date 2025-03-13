@@ -65,45 +65,31 @@ class UserService:
         user.last_login = datetime.now()
         return await self.auth_user_repo.save(user)
 
-    async def _extract_existing_data_from_id(
+    async def _extract_existing_userprofile_from_id(
         self, _id: int
-    ) -> Tuple[AuthUser, UsersUserprofile]:
-        existing_auth_user = await self.auth_user_repo.find_one(id=_id)
-        if not existing_auth_user:
-            raise ValueError("User with that id does not exist")
+    ) -> UsersUserprofile:
         existing_userprofile = await self.users_userprofile_repo.find_one(
-            user_id=existing_auth_user.id
+            user_id=_id
         )
         if not existing_userprofile:
             raise ValueError("User profile does not found")
-        return (existing_auth_user, existing_userprofile)
+        return existing_userprofile
 
     async def get_status(self, _id: int) -> str:
-        _, existing_userprofile = await self._extract_existing_data_from_id(
-            _id
+        existing_userprofile = (
+            await self._extract_existing_userprofile_from_id(_id)
         )
         return {"status": existing_userprofile.role}
 
-    async def get_user_info(self, _id: int) -> dict:
-        existing_auth_user, existing_userprofile = (
-            await self._extract_existing_data_from_id(_id)
-        )
-        return {
-            "id": _id,
-            "username": existing_auth_user.username,
-            "email": existing_auth_user.email,
-            "first_name": existing_auth_user.first_name,
-            "last_name": existing_auth_user.last_name,
-            "middle_name": existing_userprofile.middle_name,
-            "group": existing_userprofile.group_id,
-        }
+    async def get_user_info(self, _id: int) -> UsersUserprofile:
+        return await self._extract_existing_userprofile_from_id(_id)
 
     async def get_all_teachers(self) -> tuple[int, list[UsersUserprofile]]:
         return await self.users_userprofile_repo.find_and_count(role="Teacher")
 
     async def set_user_info(self, payload):
-        existing_auth_user, existing_userprofile = (
-            await self._extract_existing_data_from_id(payload.id)
+        existing_userprofile = (
+            await self._extract_existing_userprofile_from_id(payload.id)
         )
         await self.auth_user_repo.update_by_filter(
             {
@@ -111,7 +97,7 @@ class UserService:
                 "last_name": payload.last_name,
                 "email": payload.email,
             },
-            id=existing_auth_user.id,
+            id=existing_userprofile.user_id,
         )
         await self.users_userprofile_repo.update_by_filter(
             {"middle_name": payload.middle_name, "group_id": payload.group_id},

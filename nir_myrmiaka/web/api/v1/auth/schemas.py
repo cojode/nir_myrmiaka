@@ -2,7 +2,8 @@ from pydantic import BaseModel, Field
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     UsernameField,
-    UserUpdateRequest,
+    HeadlessUserUpdateRequest,
+    AuthUserResponseModel,
 )
 from typing import Optional
 
@@ -20,16 +21,7 @@ class RegisterEssentials(PasswordMixinSchema, UsernameField):
     role: Optional[str] = Field(max_length=20)
 
 
-class UserCreateRequest(RegisterEssentials, UserUpdateRequest): ...
-
-
-class AuthUserResponseModel(BaseModel):
-    id: int
-    username: str
-    email: Optional[str]
-
-    class Config:
-        from_attributes = True
+class UserCreateRequest(RegisterEssentials, HeadlessUserUpdateRequest): ...
 
 
 class RegisterResponse(GenericResponse[AuthUserResponseModel]): ...

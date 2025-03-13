@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import ForeignKey, Index, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base
@@ -15,7 +15,9 @@ class UsersUserprofile(Base):
     role = mapped_column(String(20), nullable=False)
 
     group = relationship("UsersGroup", back_populates="users_userprofile")
-    user = relationship("AuthUser", back_populates="users_userprofile")
+    user = relationship(
+        "AuthUser", back_populates="users_userprofile", lazy="joined"
+    )
     base_assignment = relationship(
         "BaseAssignment",
         uselist=True,

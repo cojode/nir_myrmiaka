@@ -24,6 +24,7 @@ async def get_info_user(
     user_service: UserService = container.resolve(UserService)
 
     try:
+
         info = await user_service.get_user_info(user_id)
         return InfoResponse(data=info)
     except ValueError as e:
@@ -59,7 +60,7 @@ async def set_status_user(
         raise_http_error_from_exception(e)
 
 
-@router.post(
+@router.get(
     "/all-teachers",
     status_code=status.HTTP_200_OK,
     response_model=AllTeachersResponse,

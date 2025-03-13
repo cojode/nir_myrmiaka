@@ -58,9 +58,23 @@ class IdField(BaseModel):
     id: int = Field()
 
 
-class UserUpdateRequest(IdField):
+class AuthUserResponseModel(BaseModel):
+    id: int
+    username: str
+    email: Optional[str]
+    first_name: str
+    last_name: str
+
+    class Config:
+        from_attributes = True
+
+
+class HeadlessUserUpdateRequest(BaseModel):
     first_name: Optional[str] = Field(None, max_length=150)
     last_name: Optional[str] = Field(None, max_length=150)
     email: Optional[EmailStr] = Field(None, max_length=254)
     middle_name: Optional[str] = Field(None, max_length=30)
     group_id: Optional[int] = Field(None)
+
+
+class UserUpdateRequest(HeadlessUserUpdateRequest, IdField): ...

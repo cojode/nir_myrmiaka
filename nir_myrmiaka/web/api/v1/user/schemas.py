@@ -1,19 +1,21 @@
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     GenericListResponse,
+    AuthUserResponseModel,
 )
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 
 
 class InfoResponseModel(BaseModel):
     id: int
-    username: str
-    email: Optional[EmailStr]
-    first_name: Optional[str]
-    last_name: Optional[str]
+    role: str
     middle_name: Optional[str]
-    group: Optional[int]
+
+    user: AuthUserResponseModel
+
+    class Config:
+        from_attributes = True
 
 
 class InfoResponse(GenericResponse[InfoResponseModel]): ...
@@ -31,6 +33,7 @@ class AllTeachersResponseModel(BaseModel):
     role: str
     middle_name: str
 
+    user: AuthUserResponseModel
     class Config:
         from_attributes = True
 
