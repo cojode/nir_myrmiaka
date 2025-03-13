@@ -62,8 +62,8 @@ class AuthUserResponseModel(BaseModel):
     id: int
     username: str
     email: Optional[str]
-    first_name: str
-    last_name: str
+    first_name: Optional[str]
+    last_name: Optional[str]
 
     class Config:
         from_attributes = True
