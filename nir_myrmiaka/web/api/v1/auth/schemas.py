@@ -26,7 +26,7 @@ class UserCreateRequest(RegisterEssentials, UserUpdateRequest): ...
 class AuthUserResponseModel(BaseModel):
     id: int
     username: str
-    email: str
+    email: Optional[str]
 
     class Config:
         from_attributes = True

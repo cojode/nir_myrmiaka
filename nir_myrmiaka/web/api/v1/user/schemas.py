@@ -8,7 +8,7 @@ from typing import Optional
 
 class InfoResponseModel(BaseModel):
     username: str
-    email: EmailStr
+    email: Optional[EmailStr]
     first_name: str
     last_name: str
     middle_name: str
