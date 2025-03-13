@@ -55,11 +55,10 @@ class UsernameField(BaseModel):
 
 
 class IdField(BaseModel):
-    id: int = Field()
+    user_id: int = Field()
 
 
-class AuthUserResponseModel(BaseModel):
-    id: int
+class AuthUserResponseModel(IdField):
     username: str
     email: Optional[str]
     first_name: str

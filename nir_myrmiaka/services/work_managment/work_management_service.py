@@ -21,29 +21,32 @@ class WorkManagementService:
         user: UsersUserprofile = await self.users_userprofile_repo.find_one(
             user_id=user_id
         )
+        print(user)
         if user == None:
-            raise ValueError("User with provided id does not exists")
+            raise ValueError(
+                f"User with provided id {user_id} does not exists"
+            )
         if user.role != role:
-            raise ValueError("User does not have specified role")
-
-    @staticmethod
-    def _extract_from_payload(payload, *args):
-        return {key: payload.__getattribute__(key) for key in args}
+            raise ValueError(
+                f"User with provided id {user_id} does not have specified role ({role})"
+            )
 
     async def create_assignment(self, payload):
-        new_assignment_data = self._extract_from_payload(
-            payload, "student_id", "teacher_id", "text"
-        )
-        self.verify_exists_and_role_specified(
+        new_assignment_data = {
+            "student_id": payload.student.user_id,
+            "teacher_id": payload.teacher.user_id,
+            "is_accepted": False,
+            "created_at": datetime.now(),
+            "is_reviewed": False,
+            "text": payload.text,
+        }
+        await self.verify_exists_and_role_specified(
             new_assignment_data["student_id"], "Student"
         )
-        self.verify_exists_and_role_specified(
+        await self.verify_exists_and_role_specified(
             new_assignment_data["teacher_id"], "Teacher"
         )
 
-        new_assignment_data["is_accepted"] = False
-        new_assignment_data["created_at"] = datetime.now()
-        new_assignment_data["is_reviewed"] = False
         return await self.base_assignment_repo.create(**new_assignment_data)
 
     async def browse_assignments(self, teacher_id: int):

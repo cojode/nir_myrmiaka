@@ -28,7 +28,6 @@ async def create_assignment(
 
     try:
         info = await work_management_service.create_assignment(payload)
-        print(info)
         return AssignmentResponse(data=info)
     except ValueError as e:
         raise_http_error_from_exception(e)

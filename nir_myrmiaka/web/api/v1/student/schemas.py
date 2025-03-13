@@ -2,12 +2,20 @@ from pydantic import BaseModel, Field
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     AssignmentWithStatusResponseModel,
+    IdField,
 )
 
 
+class AssignmentTeacherField(IdField): ...
+
+
+class AssignmentStudentField(IdField): ...
+
+
 class AssignmentCreateRequest(BaseModel):
-    student_id: int = Field(None)
-    teacher_id: int = Field(None)
+    student: AssignmentStudentField
+    teacher: AssignmentTeacherField
+
     text: str = Field(None)
 
 
