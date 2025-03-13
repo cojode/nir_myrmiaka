@@ -54,7 +54,11 @@ class UsernameField(BaseModel):
     username: str = Field(min_length=3, max_length=50)
 
 
-class UserUpdateRequest(UsernameField):
+class IdField(BaseModel):
+    id: int = Field()
+
+
+class UserUpdateRequest(IdField):
     first_name: Optional[str] = Field(None, max_length=150)
     last_name: Optional[str] = Field(None, max_length=150)
     email: Optional[EmailStr] = Field(None, max_length=254)

@@ -65,12 +65,12 @@ class UserService:
         user.last_login = datetime.now()
         return await self.auth_user_repo.save(user)
 
-    async def _extract_existing_data_from_username(
-        self, username: str
+    async def _extract_existing_data_from_id(
+        self, _id: int
     ) -> Tuple[AuthUser, UsersUserprofile]:
-        existing_auth_user = await self.auth_user_repo.find_one(username=username)
+        existing_auth_user = await self.auth_user_repo.find_one(id=_id)
         if not existing_auth_user:
-            raise ValueError("User with that username does not exist")
+            raise ValueError("User with that id does not exist")
         existing_userprofile = await self.users_userprofile_repo.find_one(
             user_id=existing_auth_user.id
         )
@@ -78,18 +78,19 @@ class UserService:
             raise ValueError("User profile does not found")
         return (existing_auth_user, existing_userprofile)
 
-    async def get_status(self, username: str) -> str:
-        _, existing_userprofile = await self._extract_existing_data_from_username(
-            username
+    async def get_status(self, _id: int) -> str:
+        _, existing_userprofile = await self._extract_existing_data_from_id(
+            _id
         )
         return {"status": existing_userprofile.role}
 
-    async def get_user_info(self, username: str) -> dict:
+    async def get_user_info(self, _id: int) -> dict:
         existing_auth_user, existing_userprofile = (
-            await self._extract_existing_data_from_username(username)
+            await self._extract_existing_data_from_id(_id)
         )
         return {
-            "username": username,
+            "id": _id,
+            "username": existing_auth_user.username,
             "email": existing_auth_user.email,
             "first_name": existing_auth_user.first_name,
             "last_name": existing_auth_user.last_name,
@@ -102,7 +103,7 @@ class UserService:
 
     async def set_user_info(self, payload):
         existing_auth_user, existing_userprofile = (
-            await self._extract_existing_data_from_username(payload.username)
+            await self._extract_existing_data_from_id(payload.id)
         )
         await self.auth_user_repo.update_by_filter(
             {

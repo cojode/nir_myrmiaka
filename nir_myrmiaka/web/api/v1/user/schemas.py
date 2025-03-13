@@ -7,11 +7,12 @@ from typing import Optional
 
 
 class InfoResponseModel(BaseModel):
+    id: int
     username: str
     email: Optional[EmailStr]
-    first_name: str
-    last_name: str
-    middle_name: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    middle_name: Optional[str]
     group: Optional[int]
 
 
