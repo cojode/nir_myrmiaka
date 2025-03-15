@@ -21,7 +21,6 @@ class WorkManagementService:
         user: UsersUserprofile = await self.users_userprofile_repo.find_one(
             user_id=user_id
         )
-        print(user)
         if user == None:
             raise ValueError(
                 f"User with provided id {user_id} does not exists"
@@ -59,7 +58,13 @@ class WorkManagementService:
             teacher_id=teacher_id, is_accepted=True
         )
 
-    async def accept_assignment(self, teacher_id, semester, assignment_id):
+    async def _affect_assignment(
+        self,
+        teacher_id: int,
+        assignment_id: int,
+        is_reviewed: bool | None = None,
+        is_accepted: bool | None = None,
+    ):
         self.verify_exists_and_role_specified(teacher_id, "Teacher")
         target_base_assignment: BaseAssignment = (
             await self.base_assignment_repo.find_by_id(assignment_id)
@@ -68,10 +73,23 @@ class WorkManagementService:
         if target_base_assignment is None:
             raise ValueError("Assignment not found")
 
-        target_base_assignment.is_reviewed = True
-        target_base_assignment.is_accepted = True
+        if target_base_assignment.teacher_id != teacher_id:
+            raise ValueError("Teacher is not related to this assignment")
+
+        if is_reviewed is not None:
+            target_base_assignment.is_reviewed = is_reviewed
+        if is_accepted is not None:
+            target_base_assignment.is_accepted = is_accepted
 
         await self.base_assignment_repo.save(target_base_assignment)
+
+    async def accept_assignment(self, teacher_id, semester, assignment_id):
+        await self._affect_assignment(
+            teacher_id=teacher_id,
+            assignment_id=assignment_id,
+            is_reviewed=True,
+            is_accepted=True,
+        )
 
         return await self.base_submission_repo.create(
             assignment_id=assignment_id,
@@ -79,16 +97,17 @@ class WorkManagementService:
             created_at=datetime.now(),
         )
 
-    async def decline_assignment(self, teacher_id, assignment_id):
-        self.verify_exists_and_role_specified(teacher_id, "Teacher")
-        target_base_assignment: BaseAssignment = (
-            await self.base_assignment_repo.find_by_id(assignment_id)
+    async def decline_assignment(self, teacher_id: int, assignment_id: int):
+        await self._affect_assignment(
+            teacher_id=teacher_id,
+            assignment_id=assignment_id,
+            is_reviewed=True,
+            is_accepted=False,
         )
 
-        if target_base_assignment is None:
-            raise ValueError("Assignment not found")
-
-        target_base_assignment.is_reviewed = True
-        target_base_assignment.is_accepted = False
-
-        return await self.base_assignment_repo.save(target_base_assignment)
+    async def review_assignment(self, teacher_id: int, assignment_id: int):
+        await self._affect_assignment(
+            teacher_id=teacher_id,
+            assignment_id=assignment_id,
+            is_reviewed=True,
+        )

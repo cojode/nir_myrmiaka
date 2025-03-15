@@ -27,8 +27,8 @@ class UserProfileCreateRequestModel(UserProfileRequestModel):
 
 
 class UserCreateRequest(HeadlessUserUpdateRequest):
-    auth: AuthUserRequestModel
-    user_profile: UserProfileCreateRequestModel
+    auth: Optional[AuthUserRequestModel]
+    user_profile: Optional[UserProfileCreateRequestModel]
     essentials: RegisterEssentials
 
 

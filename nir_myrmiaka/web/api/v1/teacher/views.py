@@ -24,7 +24,7 @@ router = APIRouter()
     response_model=BrowseAssignmentsResponse,
 )
 async def browse_assignments(
-    teacher_id: int, container: Container = Depends(init_container)
+    user_id: int, container: Container = Depends(init_container)
 ):
     work_management_service: WorkManagementService = container.resolve(
         WorkManagementService
@@ -32,7 +32,7 @@ async def browse_assignments(
 
     try:
         count, values = await work_management_service.browse_assignments(
-            teacher_id
+            user_id
         )
         return BrowseAssignmentsResponse(count=count, values=values)
     except ValueError as e:
@@ -53,7 +53,6 @@ async def accept_assignment(
     work_management_service: WorkManagementService = container.resolve(
         WorkManagementService
     )
-
     try:
         data = await work_management_service.accept_assignment(
             teacher_id, semester, assignment_id
@@ -79,6 +78,29 @@ async def decline_assignment(
 
     try:
         data = await work_management_service.decline_assignment(
+            teacher_id, assignment_id
+        )
+        return DeclineAssignmentResponse(data=data)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.patch(
+    "/review_assignment",
+    status_code=status.HTTP_200_OK,
+    response_model=DeclineAssignmentResponse,
+)
+async def review_assignment(
+    teacher_id: int,
+    assignment_id: int,
+    container: Container = Depends(init_container),
+):
+    work_management_service: WorkManagementService = container.resolve(
+        WorkManagementService
+    )
+
+    try:
+        data = await work_management_service.review_assignment(
             teacher_id, assignment_id
         )
         return DeclineAssignmentResponse(data=data)
