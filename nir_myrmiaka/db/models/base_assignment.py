@@ -12,12 +12,12 @@ class BaseAssignment(Base):
     )
 
     id = mapped_column(Integer, primary_key=True)
-    is_accepted = mapped_column(Boolean, nullable=False)
+    is_accepted = mapped_column(Boolean, default=None)
+    is_reviewed = mapped_column(Boolean, nullable=False)
     created_at = mapped_column(DateTime, nullable=False)
     student_id = mapped_column(ForeignKey("users_userprofile.id"), nullable=False)
     teacher_id = mapped_column(ForeignKey("users_userprofile.id"), nullable=False)
     text = mapped_column(Text, nullable=False)
-    is_reviewed = mapped_column(Boolean, nullable=False)
 
     student = relationship(
         "UsersUserprofile", foreign_keys=[student_id], back_populates="base_assignment"

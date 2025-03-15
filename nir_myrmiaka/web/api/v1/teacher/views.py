@@ -11,6 +11,8 @@ from .schemas import (
     BrowseAssignmentsResponse,
     AcceptAssignmentResponse,
     DeclineAssignmentResponse,
+    ReviewAssignmentResponse,
+    AffectAssignmentRequest,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
@@ -45,9 +47,7 @@ async def browse_assignments(
     response_model=AcceptAssignmentResponse,
 )
 async def accept_assignment(
-    teacher_id: int,
-    semester: int,
-    assignment_id: int,
+    payload: AffectAssignmentRequest,
     container: Container = Depends(init_container),
 ):
     work_management_service: WorkManagementService = container.resolve(
@@ -55,7 +55,7 @@ async def accept_assignment(
     )
     try:
         data = await work_management_service.accept_assignment(
-            teacher_id, semester, assignment_id
+            payload.teacher.user_id, payload.assignment_id
         )
         return AcceptAssignmentResponse(data=data)
     except ValueError as e:
@@ -68,8 +68,7 @@ async def accept_assignment(
     response_model=DeclineAssignmentResponse,
 )
 async def decline_assignment(
-    teacher_id: int,
-    assignment_id: int,
+    payload: AffectAssignmentRequest,
     container: Container = Depends(init_container),
 ):
     work_management_service: WorkManagementService = container.resolve(
@@ -78,7 +77,7 @@ async def decline_assignment(
 
     try:
         data = await work_management_service.decline_assignment(
-            teacher_id, assignment_id
+            payload.teacher.user_id, payload.assignment_id
         )
         return DeclineAssignmentResponse(data=data)
     except ValueError as e:
@@ -91,8 +90,7 @@ async def decline_assignment(
     response_model=DeclineAssignmentResponse,
 )
 async def review_assignment(
-    teacher_id: int,
-    assignment_id: int,
+    payload: AffectAssignmentRequest,
     container: Container = Depends(init_container),
 ):
     work_management_service: WorkManagementService = container.resolve(
@@ -101,8 +99,8 @@ async def review_assignment(
 
     try:
         data = await work_management_service.review_assignment(
-            teacher_id, assignment_id
+            payload.teacher.user_id, payload.assignment_id
         )
-        return DeclineAssignmentResponse(data=data)
+        return ReviewAssignmentResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)

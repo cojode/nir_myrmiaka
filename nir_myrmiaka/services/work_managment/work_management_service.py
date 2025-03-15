@@ -34,7 +34,6 @@ class WorkManagementService:
         new_assignment_data = {
             "student_id": payload.student.user_id,
             "teacher_id": payload.teacher.user_id,
-            "is_accepted": False,
             "created_at": datetime.now(),
             "is_reviewed": False,
             "text": payload.text,
@@ -83,7 +82,7 @@ class WorkManagementService:
 
         await self.base_assignment_repo.save(target_base_assignment)
 
-    async def accept_assignment(self, teacher_id, semester, assignment_id):
+    async def accept_assignment(self, teacher_id, assignment_id):
         await self._affect_assignment(
             teacher_id=teacher_id,
             assignment_id=assignment_id,
@@ -93,7 +92,6 @@ class WorkManagementService:
 
         return await self.base_submission_repo.create(
             assignment_id=assignment_id,
-            semester=semester,
             created_at=datetime.now(),
         )
 
