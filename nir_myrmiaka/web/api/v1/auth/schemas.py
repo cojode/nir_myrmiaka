@@ -4,6 +4,8 @@ from nir_myrmiaka.web.api.v1.schemas import (
     UsernameField,
     HeadlessUserUpdateRequest,
     AuthUserResponseModel,
+    UserProfileRequestModel,
+    AuthUserRequestModel,
 )
 from typing import Optional
 
@@ -17,11 +19,17 @@ class PasswordMixinSchema(BaseModel):
     )
 
 
-class RegisterEssentials(PasswordMixinSchema, UsernameField):
+class RegisterEssentials(PasswordMixinSchema, UsernameField): ...
+
+
+class UserProfileCreateRequestModel(UserProfileRequestModel):
     role: Optional[str] = Field(max_length=20)
 
 
-class UserCreateRequest(RegisterEssentials, HeadlessUserUpdateRequest): ...
+class UserCreateRequest(HeadlessUserUpdateRequest):
+    auth: AuthUserRequestModel
+    user_profile: UserProfileCreateRequestModel
+    essentials: RegisterEssentials
 
 
 class RegisterResponse(GenericResponse[AuthUserResponseModel]): ...

@@ -21,7 +21,11 @@ async def register_user(
     user_service: UserService = container.resolve(UserService)
 
     try:
-        auth_user, _ = await user_service.register_user(payload)
+        auth_user, _ = await user_service.register_user(
+            auth_data=payload.auth.model_dump(),
+            user_profile_data=payload.user_profile.model_dump(),
+            essentials=payload.essentials.model_dump(),
+        )
         return RegisterResponse(data=auth_user)
     except ValueError as e:
         raise_http_error_from_exception(e)

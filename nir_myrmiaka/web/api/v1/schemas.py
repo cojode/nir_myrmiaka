@@ -69,12 +69,27 @@ class AuthUserResponseModel(BaseModel):
         from_attributes = True
 
 
-class HeadlessUserUpdateRequest(BaseModel):
-    first_name: Optional[str] = Field(None, max_length=150)
-    last_name: Optional[str] = Field(None, max_length=150)
-    email: Optional[EmailStr] = Field(None, max_length=254)
+class UserProfileResponseModel(BaseModel):
     middle_name: Optional[str] = Field(None, max_length=30)
     group_id: Optional[int] = Field(None)
 
 
-class UserUpdateRequest(HeadlessUserUpdateRequest, IdField): ...
+class UserProfileRequestModel(BaseModel):
+    middle_name: Optional[str] = Field(None, max_length=30)
+    group_id: Optional[int] = Field(None)
+
+
+class AuthUserRequestModel(BaseModel):
+    first_name: Optional[str] = Field(None, max_length=150)
+    last_name: Optional[str] = Field(None, max_length=150)
+    email: Optional[EmailStr] = Field(None, max_length=254)
+
+
+class HeadlessUserUpdateRequest(BaseModel):
+    auth: AuthUserRequestModel
+    user_profile: UserProfileRequestModel
+
+
+class UserUpdateRequest(BaseModel):
+    target: IdField
+    data: HeadlessUserUpdateRequest

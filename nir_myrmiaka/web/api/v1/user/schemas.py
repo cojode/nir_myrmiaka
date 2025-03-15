@@ -28,6 +28,12 @@ class StatusResponseModel(BaseModel):
 class StatusResponse(GenericResponse[StatusResponseModel]): ...
 
 
+class SetInfoResponseModel(BaseModel): ...
+
+
+class SetInfoResponse(GenericResponse[SetInfoResponseModel]): ...
+
+
 class AllTeachersResponseModel(BaseModel):
     user_id: int
     role: str

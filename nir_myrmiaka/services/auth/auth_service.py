@@ -23,27 +23,29 @@ class UserService:
     def _extract_from_payload(payload, *args):
         return {key: payload.__getattribute__(key) for key in args}
 
-    async def register_user(self, payload) -> Tuple[AuthUser, UsersUserprofile]:
-        existing_user = await self.auth_user_repo.find_one(username=payload.username)
+    async def register_user(
+        self,
+        auth_data: dict[str, any],
+        user_profile_data: dict[str, any],
+        essentials: dict[str, any],
+    ) -> Tuple[AuthUser, UsersUserprofile]:
+        existing_user = await self.auth_user_repo.find_one(
+            username=essentials.get("username", None)
+        )
         if existing_user:
             raise ValueError("Username already taken")
 
-        auth_user_data = self._extract_from_payload(
-            payload, "password", "username", "first_name", "last_name", "email"
-        )
+        auth_user_data = essentials | auth_data
 
         auth_user_data["password"] = hash_password(auth_user_data["password"])
         auth_user_data["last_login"] = auth_user_data["date_joined"] = datetime.now()
 
         auth_user = await self.auth_user_repo.create(**auth_user_data)
 
-        users_userprofile_data = self._extract_from_payload(
-            payload, "middle_name", "role"
-        )
-        users_userprofile_data["user_id"] = auth_user.id
+        user_profile_data["user_id"] = auth_user.id
 
         users_userprofile = await self.users_userprofile_repo.create(
-            **users_userprofile_data
+            **user_profile_data
         )
 
         return (auth_user, users_userprofile)
@@ -87,19 +89,19 @@ class UserService:
     async def get_all_teachers(self) -> tuple[int, list[UsersUserprofile]]:
         return await self.users_userprofile_repo.find_and_count(role="Teacher")
 
-    async def set_user_info(self, payload):
+    async def set_user_info(
+        self,
+        user_id: int,
+        auth_data: dict[str, any],
+        user_profile_data: dict[str, any],
+    ):
         existing_userprofile = (
-            await self._extract_existing_userprofile_from_id(payload.id)
+            await self._extract_existing_userprofile_from_id(user_id)
         )
         await self.auth_user_repo.update_by_filter(
-            {
-                "first_name": payload.first_name,
-                "last_name": payload.last_name,
-                "email": payload.email,
-            },
-            id=existing_userprofile.user_id,
+            fields=auth_data,
+            id=user_id,
         )
         await self.users_userprofile_repo.update_by_filter(
-            {"middle_name": payload.middle_name, "group_id": payload.group_id},
-            id=existing_userprofile.id,
+            user_profile_data, id=existing_userprofile.id
         )

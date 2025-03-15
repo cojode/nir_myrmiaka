@@ -8,7 +8,12 @@ from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
-from .schemas import InfoResponse, StatusResponse, AllTeachersResponse
+from .schemas import (
+    InfoResponse,
+    StatusResponse,
+    AllTeachersResponse,
+    SetInfoResponse,
+)
 
 router = APIRouter()
 
@@ -48,14 +53,19 @@ async def get_status_user(
         raise_http_error_from_exception(e)
 
 
-@router.post("/set-info", status_code=status.HTTP_200_OK)
-async def set_status_user(
+@router.patch("/set-info", status_code=status.HTTP_201_CREATED)
+async def set_info_user(
     payload: UserUpdateRequest, container: Container = Depends(init_container)
 ):
-    user_service = container.resolve(UserService)
+    user_service: UserService = container.resolve(UserService)
 
     try:
-        return await user_service.set_user_info(payload)
+        await user_service.set_user_info(
+            payload.target.user_id,
+            payload.data.auth.model_dump(),
+            payload.data.user_profile.model_dump(),
+        )
+        return SetInfoResponse(data=None)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
