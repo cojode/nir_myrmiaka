@@ -114,6 +114,6 @@ class AssignmentWithStudentProfileResponseModel(AssignmentResponseModel):
     user: UserProfileResponseModel
 
 
-class AssignmentWithStatusResponseModel(
+class StatusedAssignmentResponseModel(
     AssignmentResponseModel, ComputedAssignmentStatus
 ): ...

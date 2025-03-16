@@ -20,6 +20,16 @@ from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 router = APIRouter()
 
 
+def assignment_unwrapper(item) -> dict:
+    return {
+        "student": {
+            "user": item.student.user,
+            "profile": item.student,
+        },
+        "assignment": item,
+    }
+
+
 @router.get(
     "/browse-assignments",
     status_code=status.HTTP_200_OK,
@@ -31,15 +41,16 @@ async def browse_assignments(
     work_management_service: WorkManagementService = container.resolve(
         WorkManagementService
     )
-
     try:
         count, values = await work_management_service.browse_assignments(
             user_id
         )
-        return BrowseAssignmentsResponse(count=count, values=values)
+        return BrowseAssignmentsResponse(
+            count=count,
+            values=[assignment_unwrapper(value) for value in values],
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)
-
 
 @router.post(
     "/accept_assignment",
@@ -76,10 +87,12 @@ async def decline_assignment(
     )
 
     try:
-        data = await work_management_service.decline_assignment(
+        assignmnent = await work_management_service.decline_assignment(
             payload.teacher.user_id, payload.assignment_id
         )
-        return DeclineAssignmentResponse(data=data)
+        return DeclineAssignmentResponse(
+            data=assignment_unwrapper(assignmnent)
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -98,9 +111,9 @@ async def review_assignment(
     )
 
     try:
-        data = await work_management_service.review_assignment(
+        assignmnent = await work_management_service.review_assignment(
             payload.teacher.user_id, payload.assignment_id
         )
-        return ReviewAssignmentResponse(data=data)
+        return ReviewAssignmentResponse(data=assignment_unwrapper(assignmnent))
     except ValueError as e:
         raise_http_error_from_exception(e)

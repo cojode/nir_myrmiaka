@@ -80,7 +80,7 @@ class WorkManagementService:
         if is_accepted is not None:
             target_base_assignment.is_accepted = is_accepted
 
-        await self.base_assignment_repo.save(target_base_assignment)
+        return await self.base_assignment_repo.save(target_base_assignment)
 
     async def accept_assignment(self, teacher_id, assignment_id):
         await self._affect_assignment(
@@ -96,7 +96,7 @@ class WorkManagementService:
         )
 
     async def decline_assignment(self, teacher_id: int, assignment_id: int):
-        await self._affect_assignment(
+        return await self._affect_assignment(
             teacher_id=teacher_id,
             assignment_id=assignment_id,
             is_reviewed=True,
@@ -104,7 +104,7 @@ class WorkManagementService:
         )
 
     async def review_assignment(self, teacher_id: int, assignment_id: int):
-        await self._affect_assignment(
+        return await self._affect_assignment(
             teacher_id=teacher_id,
             assignment_id=assignment_id,
             is_reviewed=True,
