@@ -1,4 +1,10 @@
-from pydantic import BaseModel, Field, EmailStr, computed_field
+from pydantic import (
+    BaseModel,
+    Field,
+    EmailStr,
+    computed_field,
+    field_validator,
+)
 from typing import Optional, TypeVar, Generic
 import datetime
 
@@ -9,15 +15,74 @@ Generic or common schemas for endpoints
 """
 
 
-class GenericResponse(BaseModel, Generic[T]):
+class GenericResponseMessageField(BaseModel):
     msg: str = Field(default="success", example="success")
+
+
+class GenericResponse(GenericResponseMessageField, Generic[T]):
     data: Optional[T]
 
 
-class GenericListResponse(BaseModel, Generic[T]):
-    msg: str = Field(default="success", example="success")
+class GenericListResponse(GenericResponseMessageField, Generic[T]):
     count: int
     values: list[T]
+
+
+class UsernameField(BaseModel):
+    username: str = Field(min_length=3, max_length=50)
+
+
+class IdField(BaseModel):
+    user_id: int = Field()
+
+
+class AuthUserResponseModel(BaseModel):
+    id: int
+    username: str
+    email: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class UserProfileResponseModel(BaseModel):
+    middle_name: Optional[str]
+    group_id: Optional[int]
+    role: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class AuthUserInfoResponseModel(BaseModel):
+    user: Optional[AuthUserResponseModel]
+
+
+class FullUserInfoResponseModel(AuthUserInfoResponseModel):
+    profile: Optional[UserProfileResponseModel]
+
+
+class UserProfileRequestModel(BaseModel):
+    middle_name: Optional[str] = Field(None, max_length=30)
+    group_id: Optional[int] = Field(None)
+
+
+class AuthUserRequestModel(BaseModel):
+    first_name: Optional[str] = Field(None, max_length=150)
+    last_name: Optional[str] = Field(None, max_length=150)
+    email: Optional[EmailStr] = Field(None, max_length=254)
+
+
+class HeadlessUserUpdateRequest(BaseModel):
+    auth: AuthUserRequestModel
+    user_profile: UserProfileRequestModel
+
+
+class UserUpdateRequest(BaseModel):
+    target: IdField
+    data: HeadlessUserUpdateRequest
 
 
 class ComputedAssignmentStatus(BaseModel):
@@ -45,51 +110,10 @@ class AssignmentResponseModel(BaseModel):
         from_attributes = True
 
 
+class AssignmentWithStudentProfileResponseModel(AssignmentResponseModel):
+    user: UserProfileResponseModel
+
+
 class AssignmentWithStatusResponseModel(
     AssignmentResponseModel, ComputedAssignmentStatus
 ): ...
-
-
-class UsernameField(BaseModel):
-    username: str = Field(min_length=3, max_length=50)
-
-
-class IdField(BaseModel):
-    user_id: int = Field()
-
-
-class AuthUserResponseModel(BaseModel):
-    id: int
-    username: str
-    email: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
-
-    class Config:
-        from_attributes = True
-
-
-class UserProfileResponseModel(BaseModel):
-    middle_name: Optional[str] = Field(None, max_length=30)
-    group_id: Optional[int] = Field(None)
-
-
-class UserProfileRequestModel(BaseModel):
-    middle_name: Optional[str] = Field(None, max_length=30)
-    group_id: Optional[int] = Field(None)
-
-
-class AuthUserRequestModel(BaseModel):
-    first_name: Optional[str] = Field(None, max_length=150)
-    last_name: Optional[str] = Field(None, max_length=150)
-    email: Optional[EmailStr] = Field(None, max_length=254)
-
-
-class HeadlessUserUpdateRequest(BaseModel):
-    auth: AuthUserRequestModel
-    user_profile: UserProfileRequestModel
-
-
-class UserUpdateRequest(BaseModel):
-    target: IdField
-    data: HeadlessUserUpdateRequest

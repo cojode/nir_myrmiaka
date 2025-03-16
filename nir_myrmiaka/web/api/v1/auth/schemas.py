@@ -3,9 +3,10 @@ from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     UsernameField,
     HeadlessUserUpdateRequest,
-    AuthUserResponseModel,
     UserProfileRequestModel,
     AuthUserRequestModel,
+    FullUserInfoResponseModel,
+    AuthUserInfoResponseModel,
 )
 from typing import Optional
 
@@ -32,7 +33,7 @@ class UserCreateRequest(HeadlessUserUpdateRequest):
     essentials: RegisterEssentials
 
 
-class RegisterResponse(GenericResponse[AuthUserResponseModel]): ...
+class RegisterResponse(GenericResponse[FullUserInfoResponseModel]): ...
 
 
-class LoginResponse(GenericResponse[AuthUserResponseModel]): ...
+class LoginResponse(GenericResponse[AuthUserInfoResponseModel]): ...

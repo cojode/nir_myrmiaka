@@ -48,11 +48,11 @@ class WorkManagementService:
         return await self.base_assignment_repo.create(**new_assignment_data)
 
     async def browse_assignments(self, teacher_id: int):
-        self.verify_exists_and_role_specified(teacher_id, "Teacher")
+        await self.verify_exists_and_role_specified(teacher_id, "Teacher")
         return await self.base_assignment_repo.find_and_count(teacher_id=teacher_id)
 
     async def browse_accepted_students(self, teacher_id: int):
-        self.verify_exists_and_role_specified(teacher_id, "Teacher")
+        await self.verify_exists_and_role_specified(teacher_id, "Teacher")
         return await self.base_assignment_repo.find_and_count(
             teacher_id=teacher_id, is_accepted=True
         )
@@ -64,7 +64,7 @@ class WorkManagementService:
         is_reviewed: bool | None = None,
         is_accepted: bool | None = None,
     ):
-        self.verify_exists_and_role_specified(teacher_id, "Teacher")
+        await self.verify_exists_and_role_specified(teacher_id, "Teacher")
         target_base_assignment: BaseAssignment = (
             await self.base_assignment_repo.find_by_id(assignment_id)
         )

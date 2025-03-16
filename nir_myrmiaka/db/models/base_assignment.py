@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Text
 from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base
@@ -20,10 +20,16 @@ class BaseAssignment(Base):
     text = mapped_column(Text, nullable=False)
 
     student = relationship(
-        "UsersUserprofile", foreign_keys=[student_id], back_populates="base_assignment"
+        "UsersUserprofile",
+        foreign_keys=[student_id],
+        back_populates="base_assignment",
+        lazy="joined",
     )
     teacher = relationship(
-        "UsersUserprofile", foreign_keys=[teacher_id], back_populates="base_assignment_"
+        "UsersUserprofile",
+        foreign_keys=[teacher_id],
+        back_populates="base_assignment_",
+        lazy="joined",
     )
     base_submission = relationship(
         "BaseSubmission", uselist=True, back_populates="assignment"

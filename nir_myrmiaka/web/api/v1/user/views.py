@@ -30,8 +30,10 @@ async def get_info_user(
 
     try:
 
-        info = await user_service.get_user_info(user_id)
-        return InfoResponse(data=info)
+        user_profile = await user_service.get_user_info(user_id)
+        return InfoResponse(
+            data={"user": user_profile.user, "profile": user_profile}
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -80,6 +82,11 @@ async def get_all_teachers(container: Container = Depends(init_container)):
 
     try:
         count, values = await user_service.get_all_teachers()
-        return AllTeachersResponse(count=count, values=values)
+        return AllTeachersResponse(
+            count=count,
+            values=[
+                {"user": value.user, "profile": value} for value in values
+            ],
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)
