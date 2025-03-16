@@ -3,8 +3,11 @@ from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     StatusedAssignmentResponseModel,
     IdField,
+    FullUserInfoResponseModel,
+    GenericListResponse,
 )
 
+from typing import Optional
 
 class AssignmentTeacherField(IdField): ...
 
@@ -20,3 +23,13 @@ class AssignmentCreateRequest(BaseModel):
 
 
 class AssignmentResponse(GenericResponse[StatusedAssignmentResponseModel]): ...
+
+
+class StatusedAssignmentWithTeacherFullUserInfoModel(BaseModel):
+    assignment: Optional[StatusedAssignmentResponseModel]
+    teacher: Optional[FullUserInfoResponseModel]
+
+
+class BrowseAssignmentsResponse(
+    GenericListResponse[StatusedAssignmentWithTeacherFullUserInfoModel]
+): ...

@@ -102,7 +102,7 @@ class ComputedAssignmentStatus(BaseModel):
 class AssignmentResponseModel(BaseModel):
     id: int
     text: str
-    is_accepted: bool
+    is_accepted: Optional[bool]
     is_reviewed: bool
     created_at: datetime.datetime
 

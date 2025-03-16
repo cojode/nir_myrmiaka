@@ -35,6 +35,11 @@ class StatusedAssignmentWithStudentFullUserInfoModel(BaseModel):
     student: Optional[FullUserInfoResponseModel]
 
 
+class BrowseAssignmentsResponse(
+    GenericListResponse[StatusedAssignmentWithStudentFullUserInfoModel]
+): ...
+
+
 class DeclineAssignmentResponse(
     GenericResponse[StatusedAssignmentWithStudentFullUserInfoModel]
 ): ...
@@ -42,9 +47,4 @@ class DeclineAssignmentResponse(
 
 class ReviewAssignmentResponse(
     GenericResponse[StatusedAssignmentWithStudentFullUserInfoModel]
-): ...
-
-
-class BrowseAssignmentsResponse(
-    GenericListResponse[StatusedAssignmentWithStudentFullUserInfoModel]
 ): ...

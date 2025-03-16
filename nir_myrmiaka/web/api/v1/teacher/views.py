@@ -17,10 +17,8 @@ from .schemas import (
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
-router = APIRouter()
 
-
-def assignment_unwrapper(item) -> dict:
+def assignment_student_unwrapper(item) -> dict:
     return {
         "student": {
             "user": item.student.user,
@@ -29,6 +27,8 @@ def assignment_unwrapper(item) -> dict:
         "assignment": item,
     }
 
+
+router = APIRouter()
 
 @router.get(
     "/browse-assignments",
@@ -42,12 +42,14 @@ async def browse_assignments(
         WorkManagementService
     )
     try:
-        count, values = await work_management_service.browse_assignments(
-            user_id
+        count, values = (
+            await work_management_service.browse_teacher_assignments(
+                teacher_id=user_id
+            )
         )
         return BrowseAssignmentsResponse(
             count=count,
-            values=[assignment_unwrapper(value) for value in values],
+            values=[assignment_student_unwrapper(value) for value in values],
         )
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -91,7 +93,7 @@ async def decline_assignment(
             payload.teacher.user_id, payload.assignment_id
         )
         return DeclineAssignmentResponse(
-            data=assignment_unwrapper(assignmnent)
+            data=assignment_student_unwrapper(assignmnent)
         )
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -114,6 +116,8 @@ async def review_assignment(
         assignmnent = await work_management_service.review_assignment(
             payload.teacher.user_id, payload.assignment_id
         )
-        return ReviewAssignmentResponse(data=assignment_unwrapper(assignmnent))
+        return ReviewAssignmentResponse(
+            data=assignment_student_unwrapper(assignmnent)
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)

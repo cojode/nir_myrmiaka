@@ -11,13 +11,17 @@ from datetime import datetime
 
 
 class WorkManagementService:
+
+    _student_role_symbolic = "Student"
+    _teacher_role_symbolic = "Teacher"
+
     def __init__(self, db: Database):
         self.db = db
         self.users_userprofile_repo = UsersUserprofileRepository(session=db)
         self.base_assignment_repo = BaseAssignmentRepository(session=db)
         self.base_submission_repo = BaseSubmissionRepository(session=db)
 
-    async def verify_exists_and_role_specified(self, user_id, role: str):
+    async def _verify_exists_and_role_specified(self, user_id, role: str):
         user: UsersUserprofile = await self.users_userprofile_repo.find_one(
             user_id=user_id
         )
@@ -30,29 +34,42 @@ class WorkManagementService:
                 f"User with provided id {user_id} does not have specified role ({role})"
             )
 
-    async def create_assignment(self, payload):
+    async def verify_student(self, user_id):
+        await self._verify_exists_and_role_specified(
+            user_id=user_id, role=self._student_role_symbolic
+        )
+
+    async def verify_teacher(self, user_id):
+        await self._verify_exists_and_role_specified(
+            user_id=user_id, role=self._teacher_role_symbolic
+        )
+
+    async def create_assignment(
+        self, student_user_id: int, teacher_user_id: int, text: str
+    ):
         new_assignment_data = {
-            "student_id": payload.student.user_id,
-            "teacher_id": payload.teacher.user_id,
+            "student_id": student_user_id,
+            "teacher_id": teacher_user_id,
             "created_at": datetime.now(),
             "is_reviewed": False,
-            "text": payload.text,
+            "text": text,
         }
-        await self.verify_exists_and_role_specified(
-            new_assignment_data["student_id"], "Student"
-        )
-        await self.verify_exists_and_role_specified(
-            new_assignment_data["teacher_id"], "Teacher"
-        )
-
+        await self.verify_student(new_assignment_data["student_id"])
+        await self.verify_teacher(new_assignment_data["teacher_id"])
         return await self.base_assignment_repo.create(**new_assignment_data)
 
-    async def browse_assignments(self, teacher_id: int):
-        await self.verify_exists_and_role_specified(teacher_id, "Teacher")
+    async def browse_teacher_assignments(self, teacher_id: int):
+        await self.verify_teacher(teacher_id)
         return await self.base_assignment_repo.find_and_count(teacher_id=teacher_id)
 
+    async def browse_student_assignments(self, student_id: int):
+        await self.verify_student(student_id)
+        return await self.base_assignment_repo.find_and_count(
+            student_id=student_id
+        )
+
     async def browse_accepted_students(self, teacher_id: int):
-        await self.verify_exists_and_role_specified(teacher_id, "Teacher")
+        await self.verify_teacher(teacher_id)
         return await self.base_assignment_repo.find_and_count(
             teacher_id=teacher_id, is_accepted=True
         )
@@ -64,7 +81,7 @@ class WorkManagementService:
         is_reviewed: bool | None = None,
         is_accepted: bool | None = None,
     ):
-        await self.verify_exists_and_role_specified(teacher_id, "Teacher")
+        await self.verify_teacher(teacher_id)
         target_base_assignment: BaseAssignment = (
             await self.base_assignment_repo.find_by_id(assignment_id)
         )

@@ -9,11 +9,22 @@ from nir_myrmiaka.services.work_managment.work_management_service import (
 from .schemas import (
     AssignmentCreateRequest,
     AssignmentResponse,
+    BrowseAssignmentsResponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
 router = APIRouter()
+
+
+def assignment_teacher_unwrapper(item) -> dict:
+    return {
+        "teacher": {
+            "user": item.teacher.user,
+            "profile": item.teacher,
+        },
+        "assignment": item,
+    }
 
 
 @router.post(
@@ -24,10 +35,41 @@ router = APIRouter()
 async def create_assignment(
     payload: AssignmentCreateRequest, container: Container = Depends(init_container)
 ):
-    work_management_service = container.resolve(WorkManagementService)
+    work_management_service: WorkManagementService = container.resolve(
+        WorkManagementService
+    )
 
     try:
-        info = await work_management_service.create_assignment(payload)
+        info = await work_management_service.create_assignment(
+            student_user_id=payload.student.user_id,
+            teacher_user_id=payload.teacher.user_id,
+            text=payload.text,
+        )
         return AssignmentResponse(data=info)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.get(
+    "/browse-assignments",
+    status_code=status.HTTP_200_OK,
+    response_model=BrowseAssignmentsResponse,
+)
+async def browse_assignments(
+    user_id: int, container: Container = Depends(init_container)
+):
+    work_management_service: WorkManagementService = container.resolve(
+        WorkManagementService
+    )
+    try:
+        count, values = (
+            await work_management_service.browse_student_assignments(
+                student_id=user_id
+            )
+        )
+        return BrowseAssignmentsResponse(
+            count=count,
+            values=[assignment_teacher_unwrapper(value) for value in values],
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)
