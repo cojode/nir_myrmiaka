@@ -3,9 +3,8 @@ from pydantic import (
     Field,
     EmailStr,
     computed_field,
-    field_validator,
 )
-from typing import Optional, TypeVar, Generic
+from typing import Optional, TypeVar, Generic, Any
 import datetime
 
 T = TypeVar("T")
@@ -35,35 +34,6 @@ class UsernameField(BaseModel):
 class IdField(BaseModel):
     user_id: int = Field()
 
-
-class AuthUserResponseModel(BaseModel):
-    id: int
-    username: str
-    email: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
-
-    class Config:
-        from_attributes = True
-
-
-class UserProfileResponseModel(BaseModel):
-    middle_name: Optional[str]
-    group_id: Optional[int]
-    role: Optional[str]
-
-    class Config:
-        from_attributes = True
-
-
-class AuthUserInfoResponseModel(BaseModel):
-    user: Optional[AuthUserResponseModel]
-
-
-class FullUserInfoResponseModel(AuthUserInfoResponseModel):
-    profile: Optional[UserProfileResponseModel]
-
-
 class UserProfileRequestModel(BaseModel):
     middle_name: Optional[str] = Field(None, max_length=30)
     group_id: Optional[int] = Field(None)
@@ -75,14 +45,9 @@ class AuthUserRequestModel(BaseModel):
     email: Optional[EmailStr] = Field(None, max_length=254)
 
 
-class HeadlessUserUpdateRequest(BaseModel):
-    auth: AuthUserRequestModel
-    user_profile: UserProfileRequestModel
-
-
-class UserUpdateRequest(BaseModel):
-    target: IdField
-    data: HeadlessUserUpdateRequest
+class HeadlessUserUpdateRequest(
+    AuthUserRequestModel, UserProfileRequestModel
+): ...
 
 
 class ComputedAssignmentStatus(BaseModel):
@@ -105,15 +70,37 @@ class AssignmentResponseModel(BaseModel):
     is_accepted: Optional[bool]
     is_reviewed: bool
     created_at: datetime.datetime
+    student: Optional[dict]
+    teacher: Optional[dict]
 
     class Config:
         from_attributes = True
 
 
-class AssignmentWithStudentProfileResponseModel(AssignmentResponseModel):
-    user: UserProfileResponseModel
-
-
 class StatusedAssignmentResponseModel(
     AssignmentResponseModel, ComputedAssignmentStatus
 ): ...
+
+
+class HeadlessPlainUserProfileModel(BaseModel, from_attributes=True):
+    email: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
+    middle_name: Optional[str]
+    group_id: Optional[int]
+
+
+class PlainUserProfileResponseModel(HeadlessPlainUserProfileModel):
+    id: int
+    username: str
+    # group: Optional[dict]
+    role: Optional[str]
+    date_joined: Optional[datetime.datetime]
+    last_login: Optional[datetime.datetime]
+    # assignment_subordinate: Optional[list[dict]]
+    # assignment_supervisor: Optional[list[dict]]
+
+
+class UserUpdateRequest(BaseModel):
+    target: IdField
+    data: HeadlessPlainUserProfileModel

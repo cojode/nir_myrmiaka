@@ -10,6 +10,6 @@ class UsersGroup(Base):
     id = mapped_column(Integer, primary_key=True)
     group_name = mapped_column(String(20), nullable=False)
 
-    users_userprofile = relationship(
-        "UsersUserprofile", uselist=True, back_populates="group"
+    user_profile = relationship(
+        "UserProfile", uselist=True, back_populates="group"
     )

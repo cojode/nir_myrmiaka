@@ -17,17 +17,6 @@ from .schemas import (
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
-
-def assignment_student_unwrapper(item) -> dict:
-    return {
-        "student": {
-            "user": item.student.user,
-            "profile": item.student,
-        },
-        "assignment": item,
-    }
-
-
 router = APIRouter()
 
 @router.get(
@@ -49,7 +38,7 @@ async def browse_assignments(
         )
         return BrowseAssignmentsResponse(
             count=count,
-            values=[assignment_student_unwrapper(value) for value in values],
+            values=values,
         )
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -92,9 +81,7 @@ async def decline_assignment(
         assignmnent = await work_management_service.decline_assignment(
             payload.teacher.user_id, payload.assignment_id
         )
-        return DeclineAssignmentResponse(
-            data=assignment_student_unwrapper(assignmnent)
-        )
+        return DeclineAssignmentResponse(data=assignmnent)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -116,8 +103,6 @@ async def review_assignment(
         assignmnent = await work_management_service.review_assignment(
             payload.teacher.user_id, payload.assignment_id
         )
-        return ReviewAssignmentResponse(
-            data=assignment_student_unwrapper(assignmnent)
-        )
+        return ReviewAssignmentResponse(data=assignmnent)
     except ValueError as e:
         raise_http_error_from_exception(e)

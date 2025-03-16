@@ -17,16 +17,6 @@ from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 router = APIRouter()
 
 
-def assignment_teacher_unwrapper(item) -> dict:
-    return {
-        "teacher": {
-            "user": item.teacher.user,
-            "profile": item.teacher,
-        },
-        "assignment": item,
-    }
-
-
 @router.post(
     "/create-assignment",
     status_code=status.HTTP_201_CREATED,
@@ -45,7 +35,7 @@ async def create_assignment(
             teacher_user_id=payload.teacher.user_id,
             text=payload.text,
         )
-        return AssignmentResponse(data=info)
+        return AssignmentResponse(data=info.to_dict())
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -69,7 +59,7 @@ async def browse_assignments(
         )
         return BrowseAssignmentsResponse(
             count=count,
-            values=[assignment_teacher_unwrapper(value) for value in values],
+            values=[value.to_dict() for value in values],
         )
     except ValueError as e:
         raise_http_error_from_exception(e)

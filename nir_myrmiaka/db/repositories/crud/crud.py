@@ -99,6 +99,7 @@ class CRUDRepository(AbstractCRUDRepository[T]):
             async with self.database.get_session() as session:
                 session.add(instance)
                 await session.flush([instance])
+                await session.refresh(instance)
                 return instance
         except SQLAlchemyError as e:
             raise RepositoryError(f"Failed to create entity: {e}") from e
@@ -129,7 +130,7 @@ class CRUDRepository(AbstractCRUDRepository[T]):
 
             async with self.database.get_read_only_session() as session:
                 result = await session.execute(query)
-                result_scalars = result.scalars()
+                result_scalars = result.scalars().unique()
                 return result_scalars.first() if only_first else result_scalars.all()
 
         except SQLAlchemyError as e:

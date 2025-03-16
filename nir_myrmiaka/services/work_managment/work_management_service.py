@@ -1,9 +1,10 @@
 from nir_myrmiaka.db.models.base_assignment import BaseAssignment
-from nir_myrmiaka.db.models.users_userprofile import UsersUserprofile
+from nir_myrmiaka.services.auth.auth_service import UserService
 
 from nir_myrmiaka.db.repositories.base_assignment import BaseAssignmentRepository
-from nir_myrmiaka.db.repositories.base_submission import BaseSubmissionRepository
-from nir_myrmiaka.db.repositories.users_userprofile import UsersUserprofileRepository
+from nir_myrmiaka.db.repositories.base_submission import (
+    BaseSubmissionRepository,
+)
 
 from nir_myrmiaka.db.database import Database
 
@@ -15,32 +16,19 @@ class WorkManagementService:
     _student_role_symbolic = "Student"
     _teacher_role_symbolic = "Teacher"
 
-    def __init__(self, db: Database):
+    def __init__(self, db: Database, user_service: UserService):
         self.db = db
-        self.users_userprofile_repo = UsersUserprofileRepository(session=db)
+        self.user_service: UserService = user_service
         self.base_assignment_repo = BaseAssignmentRepository(session=db)
         self.base_submission_repo = BaseSubmissionRepository(session=db)
 
-    async def _verify_exists_and_role_specified(self, user_id, role: str):
-        user: UsersUserprofile = await self.users_userprofile_repo.find_one(
-            user_id=user_id
-        )
-        if user == None:
-            raise ValueError(
-                f"User with provided id {user_id} does not exists"
-            )
-        if user.role != role:
-            raise ValueError(
-                f"User with provided id {user_id} does not have specified role ({role})"
-            )
-
     async def verify_student(self, user_id):
-        await self._verify_exists_and_role_specified(
+        await self.user_service.verify_exists_and_role_specified(
             user_id=user_id, role=self._student_role_symbolic
         )
 
     async def verify_teacher(self, user_id):
-        await self._verify_exists_and_role_specified(
+        await self.user_service.verify_exists_and_role_specified(
             user_id=user_id, role=self._teacher_role_symbolic
         )
 

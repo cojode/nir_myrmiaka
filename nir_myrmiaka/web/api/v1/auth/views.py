@@ -21,14 +21,8 @@ async def register_user(
     user_service: UserService = container.resolve(UserService)
 
     try:
-        auth_user, user_profile = await user_service.register_user(
-            auth_data=payload.auth.model_dump(),
-            user_profile_data=payload.user_profile.model_dump(),
-            essentials=payload.essentials.model_dump(),
-        )
-        return RegisterResponse(
-            data={"user": auth_user, "profile": user_profile}
-        )
+        user_profile = await user_service.register_user(payload.model_dump())
+        return RegisterResponse(data=user_profile)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -42,8 +36,8 @@ async def login_user(
     user_service: UserService = container.resolve(UserService)
 
     try:
-        auth_user = await user_service.login_user(username, password)
-        return LoginResponse(data={"user": auth_user})
+        user_profile = await user_service.login_user(username, password)
+        return LoginResponse(data=user_profile)
 
     except ValueError as e:
         raise_http_error_from_exception(e)

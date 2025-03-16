@@ -1,8 +1,6 @@
-from nir_myrmiaka.db.models.auth_user import AuthUser
-from nir_myrmiaka.db.models.users_userprofile import UsersUserprofile
+from nir_myrmiaka.db.models.user_profile import UserProfile
 
-from nir_myrmiaka.db.repositories.auth_user import AuthUserRepository
-from nir_myrmiaka.db.repositories.users_userprofile import UsersUserprofileRepository
+from nir_myrmiaka.db.repositories.user_profile import UserProfileRepository
 
 from nir_myrmiaka.services.auth.security import hash_password, verify_password
 
@@ -10,51 +8,37 @@ from nir_myrmiaka.db.database import Database
 
 from datetime import datetime
 
-from typing import Tuple
-
 
 class UserService:
     def __init__(self, db: Database):
         self.db = db
-        self.auth_user_repo = AuthUserRepository(session=db)
-        self.users_userprofile_repo = UsersUserprofileRepository(session=db)
+        self.user_profile_repo = UserProfileRepository(session=db)
 
     @staticmethod
     def _extract_from_payload(payload, *args):
         return {key: payload.__getattribute__(key) for key in args}
 
-    async def register_user(
-        self,
-        auth_data: dict[str, any],
-        user_profile_data: dict[str, any],
-        essentials: dict[str, any],
-    ) -> Tuple[AuthUser, UsersUserprofile]:
-        existing_user = await self.auth_user_repo.find_one(
-            username=essentials.get("username", None)
+    async def register_user(self, data: dict[str, any]) -> UserProfile:
+        existing_user = await self.user_profile_repo.find_one(
+            username=data["username"]
         )
         if existing_user:
             raise ValueError("Username already taken")
 
-        auth_user_data = essentials | auth_data
+        data["password"] = hash_password(data["password"])
+        data["last_login"] = data["date_joined"] = datetime.now()
 
-        auth_user_data["password"] = hash_password(auth_user_data["password"])
-        auth_user_data["last_login"] = auth_user_data["date_joined"] = datetime.now()
+        new_user = await self.user_profile_repo.create(**data)
 
-        auth_user = await self.auth_user_repo.create(**auth_user_data)
-
-        user_profile_data["user_id"] = auth_user.id
-
-        users_userprofile = await self.users_userprofile_repo.create(
-            **user_profile_data
-        )
-
-        return (auth_user, users_userprofile)
+        return new_user
 
     async def login_user(self, username: str, password: str):
 
-        async def authenticate_user(_, username: str, password: str) -> AuthUser | None:
+        async def authenticate_user(
+            _, username: str, password: str
+        ) -> UserProfile | None:
             """Inner logic of authentication."""
-            user = await self.auth_user_repo.find_one(username=username)
+            user = await self.user_profile_repo.find_one(username=username)
             if user and verify_password(password, user.password):
                 return user
             return None
@@ -65,16 +49,14 @@ class UserService:
             raise ValueError("Invalid credentials")
 
         user.last_login = datetime.now()
-        return await self.auth_user_repo.save(user)
+        return await self.user_profile_repo.save(user)
 
     async def _extract_existing_userprofile_from_id(
         self, _id: int
-    ) -> UsersUserprofile:
-        existing_userprofile = await self.users_userprofile_repo.find_one(
-            user_id=_id
-        )
+    ) -> UserProfile:
+        existing_userprofile = await self.user_profile_repo.find_one(id=_id)
         if not existing_userprofile:
-            raise ValueError("User profile does not found")
+            raise ValueError("User does not exists")
         return existing_userprofile
 
     async def get_status(self, _id: int) -> str:
@@ -83,25 +65,29 @@ class UserService:
         )
         return {"status": existing_userprofile.role}
 
-    async def get_user_info(self, _id: int) -> UsersUserprofile:
+    async def get_user_info(self, _id: int) -> UserProfile:
         return await self._extract_existing_userprofile_from_id(_id)
 
-    async def get_all_teachers(self) -> tuple[int, list[UsersUserprofile]]:
-        return await self.users_userprofile_repo.find_and_count(role="Teacher")
+    async def get_all_teachers(self) -> tuple[int, list[UserProfile]]:
+        return await self.user_profile_repo.find_and_count(role="Teacher")
 
     async def set_user_info(
         self,
-        user_id: int,
-        auth_data: dict[str, any],
-        user_profile_data: dict[str, any],
+        payload: dict[str, any],
     ):
-        existing_userprofile = (
-            await self._extract_existing_userprofile_from_id(user_id)
+        target_id = payload["target"]["user_id"]
+        await self._extract_existing_userprofile_from_id(target_id)
+        await self.user_profile_repo.update_by_filter(
+            fields=payload["data"], id=target_id
         )
-        await self.auth_user_repo.update_by_filter(
-            fields=auth_data,
-            id=user_id,
-        )
-        await self.users_userprofile_repo.update_by_filter(
-            user_profile_data, id=existing_userprofile.id
-        )
+
+    async def verify_exists_and_role_specified(self, user_id, role: str):
+        user: UserProfile = await self.user_profile_repo.find_one(id=user_id)
+        if user == None:
+            raise ValueError(
+                f"User with provided id {user_id} does not exists"
+            )
+        if user.role != role:
+            raise ValueError(
+                f"User with provided id {user_id} does not have specified role ({role})"
+            )

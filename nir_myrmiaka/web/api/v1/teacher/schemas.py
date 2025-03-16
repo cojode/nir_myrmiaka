@@ -2,7 +2,7 @@ from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     GenericListResponse,
     StatusedAssignmentResponseModel,
-    FullUserInfoResponseModel,
+    PlainUserProfileResponseModel,
     IdField,
 )
 from pydantic import BaseModel
@@ -32,7 +32,7 @@ class AcceptAssignmentResponse(
 
 class StatusedAssignmentWithStudentFullUserInfoModel(BaseModel):
     assignment: Optional[StatusedAssignmentResponseModel]
-    student: Optional[FullUserInfoResponseModel]
+    student: Optional[PlainUserProfileResponseModel]
 
 
 class BrowseAssignmentsResponse(

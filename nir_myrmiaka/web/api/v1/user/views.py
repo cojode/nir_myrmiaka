@@ -29,11 +29,7 @@ async def get_info_user(
     user_service: UserService = container.resolve(UserService)
 
     try:
-
-        user_profile = await user_service.get_user_info(user_id)
-        return InfoResponse(
-            data={"user": user_profile.user, "profile": user_profile}
-        )
+        return InfoResponse(data=await user_service.get_user_info(user_id))
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -50,6 +46,7 @@ async def get_status_user(
 
     try:
         role = await user_service.get_status(user_id)
+        print(role)
         return StatusResponse(data=role)
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -57,16 +54,13 @@ async def get_status_user(
 
 @router.patch("/set-info", status_code=status.HTTP_201_CREATED)
 async def set_info_user(
-    payload: UserUpdateRequest, container: Container = Depends(init_container)
+    payload: UserUpdateRequest,
+    container: Container = Depends(init_container),
 ):
     user_service: UserService = container.resolve(UserService)
 
     try:
-        await user_service.set_user_info(
-            payload.target.user_id,
-            payload.data.auth.model_dump(),
-            payload.data.user_profile.model_dump(),
-        )
+        await user_service.set_user_info(payload.model_dump())
         return SetInfoResponse(data=None)
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -82,11 +76,10 @@ async def get_all_teachers(container: Container = Depends(init_container)):
 
     try:
         count, values = await user_service.get_all_teachers()
+        print([value.to_dict() for value in values])
         return AllTeachersResponse(
             count=count,
-            values=[
-                {"user": value.user, "profile": value} for value in values
-            ],
+            values=[value.to_dict() for value in values],
         )
     except ValueError as e:
         raise_http_error_from_exception(e)
