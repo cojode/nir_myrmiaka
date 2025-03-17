@@ -100,6 +100,24 @@ class PlainUserProfileResponseModel(HeadlessPlainUserProfileModel):
     assignment_subordinate: Optional[list[dict]]
     assignment_supervisor: Optional[list[dict]]
 
+    @computed_field
+    @property
+    def last_accepted_assignment_subordinate(self) -> Optional[dict]:
+        if not self.assignment_subordinate:
+            return
+        for assignment in self.assignment_subordinate[::-1]:
+            if assignment.get("is_accepted", None) == True:
+                return assignment
+
+    @computed_field
+    @property
+    def last_accepted_assignment_supervisor(self) -> Optional[dict]:
+        if not self.assignment_supervisor:
+            return
+        for assignment in self.assignment_supervisor[::-1]:
+            if assignment.get("is_accepted", None) == True:
+                return assignment
+
 
 class UserUpdateRequest(BaseModel):
     target: IdField
