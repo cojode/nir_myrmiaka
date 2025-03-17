@@ -99,3 +99,4 @@ class UserService(metaclass=LoggingMeta):
             raise ValueError(
                 f"User with provided id {user_id} does not have specified role ({role})"
             )
+        return user

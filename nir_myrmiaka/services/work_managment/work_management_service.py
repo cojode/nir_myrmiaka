@@ -23,9 +23,17 @@ class WorkManagementService:
         self.base_submission_repo = BaseSubmissionRepository(session=db)
 
     async def verify_student(self, user_id):
-        await self.user_service.verify_exists_and_role_specified(
+        return await self.user_service.verify_exists_and_role_specified(
             user_id=user_id, role=self._student_role_symbolic
         )
+
+    async def verify_student_no_active_assignment(self, user_id):
+        user_profile = await self.verify_student(user_id)
+        for assignment in user_profile.assignment_subordinate:
+            if assignment.is_accepted == True:
+                raise ValueError(
+                    "Student obtains accepted assignment, no new assignment creation allowed"
+                )
 
     async def verify_teacher(self, user_id):
         await self.user_service.verify_exists_and_role_specified(
@@ -42,47 +50,14 @@ class WorkManagementService:
             "is_reviewed": False,
             "text": text,
         }
-        await self.verify_student(new_assignment_data["student_id"])
+        await self.verify_student_no_active_assignment(
+            new_assignment_data["student_id"]
+        )
         await self.verify_teacher(new_assignment_data["teacher_id"])
         created_assignment = await self.base_assignment_repo.create(
             **new_assignment_data
         )
         return created_assignment.to_dict()
-
-    async def browse_teacher_assignments(
-        self, teacher_id: int
-    ) -> tuple[int, list[dict]]:
-        await self.verify_teacher(teacher_id)
-        count, found_assignments = (
-            await self.base_assignment_repo.find_and_count(
-                teacher_id=teacher_id
-            )
-        )
-        return count, [item.to_dict() for item in found_assignments]
-
-    async def browse_student_assignments(
-        self, student_id: int
-    ) -> tuple[int, list[dict]]:
-        await self.verify_student(student_id)
-        count, found_assignments = (
-            await self.base_assignment_repo.find_and_count(
-                student_id=student_id
-            )
-        )
-
-        return count, [item.to_dict() for item in found_assignments]
-
-    async def browse_accepted_students(
-        self, teacher_id: int
-    ) -> tuple[int, list[dict]]:
-        await self.verify_teacher(teacher_id)
-        count, accepted_assignments = (
-            await self.base_assignment_repo.find_and_count(
-                teacher_id=teacher_id, is_accepted=True
-            )
-        )
-
-        return count, [item.to_dict() for item in accepted_assignments]
 
     async def _affect_assignment(
         self,
