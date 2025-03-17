@@ -8,8 +8,10 @@ from nir_myrmiaka.db.database import Database
 
 from datetime import datetime
 
+from nir_myrmiaka.log import LoggingMeta, logger
 
-class UserService:
+
+class UserService(metaclass=LoggingMeta):
     def __init__(self, db: Database):
         self.db = db
         self.user_profile_repo = UserProfileRepository(session=db)

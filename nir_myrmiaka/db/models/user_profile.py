@@ -72,15 +72,18 @@ class UserProfile(Base):
             "group_id": self.group_id,
         }
 
-        if insp.attrs.group.loaded_value:
-            data["group"] = (
+        data["group"] = (
+            (
                 self.group.to_plain_dict()
                 if hasattr(self.group, "to_plain_dict")
                 else None
             )
+            if insp.attrs.group.loaded_value
+            else None
+        )
 
-        if insp.attrs.assignment_subordinate.loaded_value:
-            data["assignment_subordinate"] = [
+        data["assignment_subordinate"] = (
+            [
                 (
                     assignment.to_plain_dict()
                     if hasattr(assignment, "to_plain_dict")
@@ -88,9 +91,12 @@ class UserProfile(Base):
                 )
                 for assignment in self.assignment_subordinate
             ]
+            if insp.attrs.assignment_subordinate.loaded_value
+            else None
+        )
 
-        if insp.attrs.assignment_supervisor.loaded_value:
-            data["assignment_supervisor"] = [
+        data["assignment_supervisor"] = (
+            [
                 (
                     assignment.to_plain_dict()
                     if hasattr(assignment, "to_plain_dict")
@@ -98,6 +104,9 @@ class UserProfile(Base):
                 )
                 for assignment in self.assignment_supervisor
             ]
+            if insp.attrs.assignment_supervisor.loaded_value
+            else None
+        )
 
         return data
 

@@ -93,12 +93,12 @@ class HeadlessPlainUserProfileModel(BaseModel, from_attributes=True):
 class PlainUserProfileResponseModel(HeadlessPlainUserProfileModel):
     id: int
     username: str
-    # group: Optional[dict]
+    group: Optional[dict]
     role: Optional[str]
     date_joined: Optional[datetime.datetime]
     last_login: Optional[datetime.datetime]
-    # assignment_subordinate: Optional[list[dict]]
-    # assignment_supervisor: Optional[list[dict]]
+    assignment_subordinate: Optional[list[dict]]
+    assignment_supervisor: Optional[list[dict]]
 
 
 class UserUpdateRequest(BaseModel):
