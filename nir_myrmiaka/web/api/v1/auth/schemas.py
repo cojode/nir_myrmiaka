@@ -4,7 +4,7 @@ from nir_myrmiaka.web.api.v1.schemas import (
     UsernameField,
     HeadlessUserUpdateRequest,
     UserProfileRequestModel,
-    PlainUserProfileResponseModel,
+    UserProfileResponseModel,
 )
 from typing import Optional
 
@@ -28,7 +28,7 @@ class UserProfileCreateRequestModel(HeadlessUserUpdateRequest):
 class UserCreateRequest(UserProfileCreateRequestModel, RegisterEssentials): ...
 
 
-class RegisterResponse(GenericResponse[PlainUserProfileResponseModel]): ...
+class RegisterResponse(GenericResponse[UserProfileResponseModel]): ...
 
 
-class LoginResponse(GenericResponse[PlainUserProfileResponseModel]): ...
+class LoginResponse(GenericResponse[UserProfileResponseModel]): ...

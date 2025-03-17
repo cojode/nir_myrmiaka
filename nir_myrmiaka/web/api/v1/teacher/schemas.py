@@ -1,7 +1,7 @@
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     GenericListResponse,
-    StatusedAssignmentResponseModel,
+    AssignmentResponseModel,
     IdField,
 )
 from pydantic import BaseModel
@@ -30,15 +30,11 @@ class AcceptAssignmentResponse(
 
 
 class BrowseAssignmentsResponse(
-    GenericListResponse[StatusedAssignmentResponseModel]
+    GenericListResponse[AssignmentResponseModel]
 ): ...
 
 
-class DeclineAssignmentResponse(
-    GenericResponse[StatusedAssignmentResponseModel]
-): ...
+class DeclineAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
 
 
-class ReviewAssignmentResponse(
-    GenericResponse[StatusedAssignmentResponseModel]
-): ...
+class ReviewAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...

@@ -1,13 +1,13 @@
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     GenericListResponse,
-    PlainUserProfileResponseModel,
+    UserProfileResponseModel,
 )
 from pydantic import BaseModel
 from typing import Optional
 
 
-class InfoResponseModel(PlainUserProfileResponseModel): ...
+class InfoResponseModel(UserProfileResponseModel): ...
 
 
 class InfoResponse(GenericResponse[InfoResponseModel]): ...
@@ -26,6 +26,4 @@ class SetInfoResponseModel(BaseModel): ...
 class SetInfoResponse(GenericResponse[SetInfoResponseModel]): ...
 
 
-class AllTeachersResponse(
-    GenericListResponse[PlainUserProfileResponseModel]
-): ...
+class AllTeachersResponse(GenericListResponse[UserProfileResponseModel]): ...

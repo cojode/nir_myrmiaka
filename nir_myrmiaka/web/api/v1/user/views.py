@@ -8,6 +8,8 @@ from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
+import json
+
 from .schemas import (
     InfoResponse,
     StatusResponse,
@@ -29,7 +31,9 @@ async def get_info_user(
     user_service: UserService = container.resolve(UserService)
 
     try:
-        return InfoResponse(data=await user_service.get_user_info(user_id))
+        data = await user_service.get_user_info(user_id)
+        print(json.dumps(data, sort_keys=True, indent=4))
+        return InfoResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)
 

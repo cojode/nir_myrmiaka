@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
-    StatusedAssignmentResponseModel,
+    AssignmentResponseModel,
     IdField,
 )
 
@@ -19,4 +19,4 @@ class AssignmentCreateRequest(BaseModel):
     text: str = Field(None)
 
 
-class AssignmentResponse(GenericResponse[StatusedAssignmentResponseModel]): ...
+class AssignmentResponse(GenericResponse[AssignmentResponseModel]): ...

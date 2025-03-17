@@ -50,7 +50,13 @@ class HeadlessUserUpdateRequest(
 ): ...
 
 
-class ComputedAssignmentStatus(BaseModel):
+class BaseAssignmentResponseModel(BaseModel, from_attributes=True):
+    id: int
+    text: str
+    is_accepted: Optional[bool]
+    is_reviewed: bool
+    created_at: datetime.datetime
+
     @computed_field
     @property
     def status(self) -> str:
@@ -60,29 +66,13 @@ class ComputedAssignmentStatus(BaseModel):
             return "Отказано"
         return "Принято"
 
-    class Config:
-        from_attributes = True
+
+class PlainAssignmentResponseModel(BaseAssignmentResponseModel):
+    student_id: int
+    teacher_id: int
 
 
-class AssignmentResponseModel(BaseModel):
-    id: int
-    text: str
-    is_accepted: Optional[bool]
-    is_reviewed: bool
-    created_at: datetime.datetime
-    student: Optional[dict]
-    teacher: Optional[dict]
-
-    class Config:
-        from_attributes = True
-
-
-class StatusedAssignmentResponseModel(
-    AssignmentResponseModel, ComputedAssignmentStatus
-): ...
-
-
-class HeadlessPlainUserProfileModel(BaseModel, from_attributes=True):
+class HeadlessUserProfileModel(BaseModel, from_attributes=True):
     email: Optional[str]
     first_name: Optional[str]
     last_name: Optional[str]
@@ -90,35 +80,52 @@ class HeadlessPlainUserProfileModel(BaseModel, from_attributes=True):
     group_id: Optional[int]
 
 
-class PlainUserProfileResponseModel(HeadlessPlainUserProfileModel):
+class UserUpdateRequest(BaseModel):
+    target: IdField
+    data: HeadlessUserProfileModel
+
+
+class BaseUserProfileModel(HeadlessUserProfileModel):
     id: int
     username: str
-    group: Optional[dict]
-    role: Optional[str]
     date_joined: Optional[datetime.datetime]
     last_login: Optional[datetime.datetime]
-    assignment_subordinate: Optional[list[dict]]
-    assignment_supervisor: Optional[list[dict]]
+    role: Optional[str]
+
+
+class PlainUserProfileModel(BaseUserProfileModel):
+    group_id: Optional[int]
+
+
+class AssignmentResponseModel(BaseAssignmentResponseModel):
+    student: Optional[PlainUserProfileModel]
+    teacher: Optional[PlainUserProfileModel]
+
+
+class UserProfileResponseModel(BaseUserProfileModel):
+
+    group: Optional[dict]
+    assignment_subordinate: Optional[list[PlainAssignmentResponseModel]]
+    assignment_supervisor: Optional[list[PlainAssignmentResponseModel]]
 
     @computed_field
     @property
-    def last_accepted_assignment_subordinate(self) -> Optional[dict]:
+    def last_accepted_assignment_subordinate(
+        self,
+    ) -> Optional[PlainAssignmentResponseModel]:
         if not self.assignment_subordinate:
             return
         for assignment in self.assignment_subordinate[::-1]:
-            if assignment.get("is_accepted", None) == True:
+            if assignment.is_accepted == True:
                 return assignment
 
     @computed_field
     @property
-    def last_accepted_assignment_supervisor(self) -> Optional[dict]:
+    def last_accepted_assignment_supervisor(
+        self,
+    ) -> Optional[PlainAssignmentResponseModel]:
         if not self.assignment_supervisor:
             return
         for assignment in self.assignment_supervisor[::-1]:
-            if assignment.get("is_accepted", None) == True:
+            if assignment.is_accepted == True:
                 return assignment
-
-
-class UserUpdateRequest(BaseModel):
-    target: IdField
-    data: HeadlessPlainUserProfileModel
