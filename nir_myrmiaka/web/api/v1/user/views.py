@@ -22,7 +22,7 @@ router = APIRouter()
 
 @router.get(
     "/{user_id}/info",
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_200_OK,
     response_model=InfoResponse,
 )
 async def get_info_user(
