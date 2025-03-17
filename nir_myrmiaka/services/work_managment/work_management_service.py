@@ -36,9 +36,24 @@ class WorkManagementService:
                 )
 
     async def verify_teacher(self, user_id):
-        await self.user_service.verify_exists_and_role_specified(
+        return await self.user_service.verify_exists_and_role_specified(
             user_id=user_id, role=self._teacher_role_symbolic
         )
+
+    async def get_accepted_students_plain(
+        self, teacher_id: int
+    ) -> tuple[int, dict]:
+        teacher = await self.verify_teacher(teacher_id)
+        result = []
+        for student_id in {
+            assignment.student_id
+            for assignment in teacher.assignment_supervisor
+            if assignment.is_accepted
+        }:
+            result.append(
+                await self.user_service.get_plain_user_info(student_id)
+            )
+        return len(result), result
 
     async def create_assignment(
         self, student_user_id: int, teacher_user_id: int, text: str

@@ -12,11 +12,35 @@ from .schemas import (
     DeclineAssignmentResponse,
     ReviewAssignmentResponse,
     AffectAssignmentRequest,
+    ListStudentsResponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
 router = APIRouter()
+
+
+@router.get(
+    "/list-students",
+    status_code=status.HTTP_200_OK,
+    response_model=ListStudentsResponse,
+)
+async def list_students(
+    teacher_id: int,
+    container: Container = Depends(init_container),
+):
+    work_management_service: WorkManagementService = container.resolve(
+        WorkManagementService
+    )
+    try:
+        count, values = (
+            await work_management_service.get_accepted_students_plain(
+                teacher_id=teacher_id
+            )
+        )
+        return ListStudentsResponse(count=count, values=values)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
 
 
 @router.post(

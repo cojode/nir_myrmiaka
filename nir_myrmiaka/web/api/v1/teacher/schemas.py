@@ -3,6 +3,7 @@ from nir_myrmiaka.web.api.v1.schemas import (
     GenericListResponse,
     AssignmentResponseModel,
     IdField,
+    PlainUserProfileModel,
 )
 from pydantic import BaseModel
 from typing import Optional
@@ -38,3 +39,6 @@ class DeclineAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
 
 
 class ReviewAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
+
+
+class ListStudentsResponse(GenericListResponse[PlainUserProfileModel]): ...

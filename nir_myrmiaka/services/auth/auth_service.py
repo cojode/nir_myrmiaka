@@ -73,6 +73,10 @@ class UserService(metaclass=LoggingMeta):
         user_profile = await self._extract_existing_userprofile_from_id(_id)
         return user_profile.to_dict()
 
+    async def get_plain_user_info(self, _id: int) -> dict:
+        user_profile = await self._extract_existing_userprofile_from_id(_id)
+        return user_profile.to_plain_dict()
+
     async def get_all_teachers(self) -> tuple[int, list[dict]]:
         count, teachers = await self.user_profile_repo.find_and_count(
             role="Teacher"
