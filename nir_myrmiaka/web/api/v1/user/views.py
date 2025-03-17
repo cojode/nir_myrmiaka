@@ -12,7 +12,6 @@ import json
 
 from .schemas import (
     InfoResponse,
-    StatusResponse,
     AllTeachersResponse,
     SetInfoResponse,
 )
@@ -34,23 +33,6 @@ async def get_info_user(
         data = await user_service.get_user_info(user_id)
         print(json.dumps(data, sort_keys=True, indent=4))
         return InfoResponse(data=data)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
-
-
-@router.get(
-    "/{user_id}/status",
-    status_code=status.HTTP_200_OK,
-    response_model=StatusResponse,
-)
-async def get_status_user(
-    user_id: str, container: Container = Depends(init_container)
-):
-    user_service: UserService = container.resolve(UserService)
-
-    try:
-        role = await user_service.get_status(user_id)
-        return StatusResponse(data=role)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
