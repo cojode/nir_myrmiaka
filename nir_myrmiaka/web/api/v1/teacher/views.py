@@ -18,8 +18,9 @@ from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
 router = APIRouter()
 
+
 @router.post(
-    "/accept_assignment",
+    "/accept-assignment",
     status_code=status.HTTP_201_CREATED,
     response_model=AcceptAssignmentResponse,
 )
@@ -41,7 +42,7 @@ async def accept_assignment(
 
 
 @router.patch(
-    "/decline_assignment",
+    "/decline-assignment",
     status_code=status.HTTP_200_OK,
     response_model=DeclineAssignmentResponse,
 )
@@ -64,7 +65,7 @@ async def decline_assignment(
 
 
 @router.patch(
-    "/review_assignment",
+    "/review-assignment",
     status_code=status.HTTP_200_OK,
     response_model=DeclineAssignmentResponse,
 )
