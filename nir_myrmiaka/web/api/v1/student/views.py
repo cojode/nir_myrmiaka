@@ -30,12 +30,13 @@ async def create_assignment(
     )
 
     try:
-        info = await work_management_service.create_assignment(
-            student_user_id=payload.student.user_id,
-            teacher_user_id=payload.teacher.user_id,
-            text=payload.text,
+        return AssignmentResponse(
+            data=await work_management_service.create_assignment(
+                student_user_id=payload.student.user_id,
+                teacher_user_id=payload.teacher.user_id,
+                text=payload.text,
+            )
         )
-        return AssignmentResponse(data=info.to_dict())
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -59,7 +60,7 @@ async def browse_assignments(
         )
         return BrowseAssignmentsResponse(
             count=count,
-            values=[value.to_dict() for value in values],
+            values=values,
         )
     except ValueError as e:
         raise_http_error_from_exception(e)

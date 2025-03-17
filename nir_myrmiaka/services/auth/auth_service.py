@@ -18,7 +18,7 @@ class UserService:
     def _extract_from_payload(payload, *args):
         return {key: payload.__getattribute__(key) for key in args}
 
-    async def register_user(self, data: dict[str, any]) -> UserProfile:
+    async def register_user(self, data: dict[str, any]) -> dict:
         existing_user = await self.user_profile_repo.find_one(
             username=data["username"]
         )
@@ -30,9 +30,9 @@ class UserService:
 
         new_user = await self.user_profile_repo.create(**data)
 
-        return new_user
+        return new_user.to_dict()
 
-    async def login_user(self, username: str, password: str):
+    async def login_user(self, username: str, password: str) -> dict:
 
         async def authenticate_user(
             _, username: str, password: str
@@ -49,7 +49,9 @@ class UserService:
             raise ValueError("Invalid credentials")
 
         user.last_login = datetime.now()
-        return await self.user_profile_repo.save(user)
+        saved_user_profile = await self.user_profile_repo.save(user)
+
+        return saved_user_profile.to_dict()
 
     async def _extract_existing_userprofile_from_id(
         self, _id: int
@@ -65,11 +67,15 @@ class UserService:
         )
         return {"status": existing_userprofile.role}
 
-    async def get_user_info(self, _id: int) -> UserProfile:
-        return await self._extract_existing_userprofile_from_id(_id)
+    async def get_user_info(self, _id: int) -> dict:
+        user_profile = await self._extract_existing_userprofile_from_id(_id)
+        return user_profile.to_dict()
 
-    async def get_all_teachers(self) -> tuple[int, list[UserProfile]]:
-        return await self.user_profile_repo.find_and_count(role="Teacher")
+    async def get_all_teachers(self) -> tuple[int, list[dict]]:
+        count, teachers = await self.user_profile_repo.find_and_count(
+            role="Teacher"
+        )
+        return count, [teacher.to_dict() for teacher in teachers]
 
     async def set_user_info(
         self,

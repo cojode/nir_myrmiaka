@@ -46,7 +46,6 @@ async def get_status_user(
 
     try:
         role = await user_service.get_status(user_id)
-        print(role)
         return StatusResponse(data=role)
     except ValueError as e:
         raise_http_error_from_exception(e)
@@ -76,10 +75,9 @@ async def get_all_teachers(container: Container = Depends(init_container)):
 
     try:
         count, values = await user_service.get_all_teachers()
-        print([value.to_dict() for value in values])
         return AllTeachersResponse(
             count=count,
-            values=[value.to_dict() for value in values],
+            values=values,
         )
     except ValueError as e:
         raise_http_error_from_exception(e)

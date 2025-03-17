@@ -56,10 +56,11 @@ async def accept_assignment(
         WorkManagementService
     )
     try:
-        data = await work_management_service.accept_assignment(
-            payload.teacher.user_id, payload.assignment_id
+        return AcceptAssignmentResponse(
+            data=await work_management_service.accept_assignment(
+                payload.teacher.user_id, payload.assignment_id
+            )
         )
-        return AcceptAssignmentResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -78,10 +79,11 @@ async def decline_assignment(
     )
 
     try:
-        assignmnent = await work_management_service.decline_assignment(
-            payload.teacher.user_id, payload.assignment_id
+        return DeclineAssignmentResponse(
+            data=await work_management_service.decline_assignment(
+                payload.teacher.user_id, payload.assignment_id
+            )
         )
-        return DeclineAssignmentResponse(data=assignmnent)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -100,9 +102,10 @@ async def review_assignment(
     )
 
     try:
-        assignmnent = await work_management_service.review_assignment(
-            payload.teacher.user_id, payload.assignment_id
+        return ReviewAssignmentResponse(
+            data=await work_management_service.review_assignment(
+                payload.teacher.user_id, payload.assignment_id
+            )
         )
-        return ReviewAssignmentResponse(data=assignmnent)
     except ValueError as e:
         raise_http_error_from_exception(e)

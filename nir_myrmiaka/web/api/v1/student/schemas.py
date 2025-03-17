@@ -24,7 +24,6 @@ class AssignmentCreateRequest(BaseModel):
 
 class AssignmentResponse(GenericResponse[StatusedAssignmentResponseModel]): ...
 
-
 class BrowseAssignmentsResponse(
     GenericListResponse[StatusedAssignmentResponseModel]
 ): ...

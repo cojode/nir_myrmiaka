@@ -34,7 +34,7 @@ class WorkManagementService:
 
     async def create_assignment(
         self, student_user_id: int, teacher_user_id: int, text: str
-    ):
+    ) -> dict:
         new_assignment_data = {
             "student_id": student_user_id,
             "teacher_id": teacher_user_id,
@@ -44,23 +44,45 @@ class WorkManagementService:
         }
         await self.verify_student(new_assignment_data["student_id"])
         await self.verify_teacher(new_assignment_data["teacher_id"])
-        return await self.base_assignment_repo.create(**new_assignment_data)
+        created_assignment = await self.base_assignment_repo.create(
+            **new_assignment_data
+        )
+        return created_assignment.to_dict()
 
-    async def browse_teacher_assignments(self, teacher_id: int):
+    async def browse_teacher_assignments(
+        self, teacher_id: int
+    ) -> tuple[int, list[dict]]:
         await self.verify_teacher(teacher_id)
-        return await self.base_assignment_repo.find_and_count(teacher_id=teacher_id)
+        count, found_assignments = (
+            await self.base_assignment_repo.find_and_count(
+                teacher_id=teacher_id
+            )
+        )
+        return count, [item.to_dict() for item in found_assignments]
 
-    async def browse_student_assignments(self, student_id: int):
+    async def browse_student_assignments(
+        self, student_id: int
+    ) -> tuple[int, list[dict]]:
         await self.verify_student(student_id)
-        return await self.base_assignment_repo.find_and_count(
-            student_id=student_id
+        count, found_assignments = (
+            await self.base_assignment_repo.find_and_count(
+                student_id=student_id
+            )
         )
 
-    async def browse_accepted_students(self, teacher_id: int):
+        return count, [item.to_dict() for item in found_assignments]
+
+    async def browse_accepted_students(
+        self, teacher_id: int
+    ) -> tuple[int, list[dict]]:
         await self.verify_teacher(teacher_id)
-        return await self.base_assignment_repo.find_and_count(
-            teacher_id=teacher_id, is_accepted=True
+        count, accepted_assignments = (
+            await self.base_assignment_repo.find_and_count(
+                teacher_id=teacher_id, is_accepted=True
+            )
         )
+
+        return count, [item.to_dict() for item in accepted_assignments]
 
     async def _affect_assignment(
         self,
@@ -68,7 +90,7 @@ class WorkManagementService:
         assignment_id: int,
         is_reviewed: bool | None = None,
         is_accepted: bool | None = None,
-    ):
+    ) -> BaseAssignment:
         await self.verify_teacher(teacher_id)
         target_base_assignment: BaseAssignment = (
             await self.base_assignment_repo.find_by_id(assignment_id)
@@ -100,17 +122,24 @@ class WorkManagementService:
             created_at=datetime.now(),
         )
 
-    async def decline_assignment(self, teacher_id: int, assignment_id: int):
-        return await self._affect_assignment(
+    async def decline_assignment(
+        self, teacher_id: int, assignment_id: int
+    ) -> dict:
+        declined_assignment = await self._affect_assignment(
             teacher_id=teacher_id,
             assignment_id=assignment_id,
             is_reviewed=True,
             is_accepted=False,
         )
+        return declined_assignment.to_dict()
 
-    async def review_assignment(self, teacher_id: int, assignment_id: int):
-        return await self._affect_assignment(
+    async def review_assignment(
+        self, teacher_id: int, assignment_id: int
+    ) -> dict:
+        reviewed_assignment = await self._affect_assignment(
             teacher_id=teacher_id,
             assignment_id=assignment_id,
             is_reviewed=True,
         )
+
+        return reviewed_assignment.to_dict()

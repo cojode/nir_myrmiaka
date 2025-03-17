@@ -4,7 +4,7 @@ from pydantic import (
     EmailStr,
     computed_field,
 )
-from typing import Optional, TypeVar, Generic, Any
+from typing import Optional, TypeVar, Generic
 import datetime
 
 T = TypeVar("T")
