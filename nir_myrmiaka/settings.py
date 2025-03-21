@@ -1,7 +1,6 @@
 import enum
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from yarl import URL
@@ -37,22 +36,12 @@ class Settings(BaseSettings):
 
     # Current environment
     environment: str = "dev"
+    version: str = "v1"
 
     log_level: LogLevel = LogLevel.INFO
     # Variables for the database
-    db_host: str = "localhost"
-    db_port: int = 5432
-    db_user: str = "nir_myrmiaka"
-    db_pass: str = "nir_myrmiaka"
-    db_base: str = "admin"
-    db_echo: bool = False
-
-    # Variables for Redis
-    redis_host: str = "nir_myrmiaka-redis"
-    redis_port: int = 6379
-    redis_user: Optional[str] = None
-    redis_pass: Optional[str] = None
-    redis_base: Optional[int] = None
+    db_file: Path = TEMP_DIR / "db.sqlite3"
+    db_echo: bool = True
 
     @property
     def db_url(self) -> URL:
@@ -61,33 +50,7 @@ class Settings(BaseSettings):
 
         :return: database URL.
         """
-        return URL.build(
-            scheme="postgresql+asyncpg",
-            host=self.db_host,
-            port=self.db_port,
-            user=self.db_user,
-            password=self.db_pass,
-            path=f"/{self.db_base}",
-        )
-
-    @property
-    def redis_url(self) -> URL:
-        """
-        Assemble REDIS URL from settings.
-
-        :return: redis URL.
-        """
-        path = ""
-        if self.redis_base is not None:
-            path = f"/{self.redis_base}"
-        return URL.build(
-            scheme="redis",
-            host=self.redis_host,
-            port=self.redis_port,
-            user=self.redis_user,
-            password=self.redis_pass,
-            path=path,
-        )
+        return URL.build(scheme="sqlite+aiosqlite", path=f"///{self.db_file}")
 
     model_config = SettingsConfigDict(
         env_file=".env",

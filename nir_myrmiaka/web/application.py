@@ -3,6 +3,7 @@ from importlib import metadata
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
 
+from nir_myrmiaka.log import configure_logging
 from nir_myrmiaka.web.api.router import api_router
 from nir_myrmiaka.web.lifespan import lifespan_setup
 
@@ -15,6 +16,7 @@ def get_app() -> FastAPI:
 
     :return: application.
     """
+    configure_logging()
     app = FastAPI(
         title="nir_myrmiaka",
         version=metadata.version("nir_myrmiaka"),

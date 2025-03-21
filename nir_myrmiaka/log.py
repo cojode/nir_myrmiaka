@@ -6,6 +6,8 @@ from loguru import logger
 
 from nir_myrmiaka.settings import settings
 
+from functools import wraps
+
 
 class InterceptHandler(logging.Handler):
     """
@@ -61,3 +63,34 @@ def configure_logging() -> None:  # pragma: no cover
         sys.stdout,
         level=settings.log_level.value,
     )
+
+
+def log_method_calls(func):
+    """
+    Decorator to log method calls, arguments, and return values.
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        original_func = wrapper.__wrapped__
+        func_name = original_func.__name__
+
+        logger.info(f"Calling {func_name} with args={args}, kwargs={kwargs}")
+        result = func(*args, **kwargs)
+        logger.info(f"{func_name} returned {result}")
+        return result
+
+    return wrapper
+
+
+class LoggingMeta(type):
+    """
+    Metaclass that automatically logs all method calls in a class.
+    """
+
+    def __new__(cls, name, bases, dct):
+        for attr_name, attr_value in dct.items():
+            if callable(attr_value) and not attr_name.startswith("__"):
+                dct[attr_name] = log_method_calls(attr_value)
+
+        return super().__new__(cls, name, bases, dct)
