@@ -12,8 +12,6 @@ services:
     volumes:
       - nir_myrmiaka-db-data:/db_data/
 
-
-
 volumes:
   nir_myrmiaka-db-data:
     name: nir_myrmiaka-db-data

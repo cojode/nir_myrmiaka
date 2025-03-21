@@ -3,7 +3,6 @@ from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base
 
-
 class BaseTopic(Base):
     __tablename__ = "base_topic"
     __table_args__ = (
@@ -14,5 +13,10 @@ class BaseTopic(Base):
     name = mapped_column(String(100), nullable=False)
     research_work_id = mapped_column(ForeignKey("base_researchwork.id"))
 
-    research_work = relationship("BaseResearchwork", back_populates="base_topic")
-    base_file = relationship("BaseFile", uselist=True, back_populates="topic")
+    research_work = relationship(
+        "BaseResearchwork", back_populates="base_topics"
+    )
+
+    submission_topics = relationship(
+        "SubmissionTopic", uselist=True, back_populates="topic"
+    )

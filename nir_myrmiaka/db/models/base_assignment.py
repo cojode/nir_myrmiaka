@@ -33,7 +33,7 @@ class BaseAssignment(Base):
         back_populates="assignment_supervisor",
         lazy="joined",
     )
-    base_submission = relationship(
+    submissions = relationship(
         "BaseSubmission", uselist=True, back_populates="assignment"
     )
 

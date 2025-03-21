@@ -2,12 +2,25 @@ services:
   api:
     ports:
       # Exposes application port.
-    - "8000:8000"
+      - "8000:8000"
     build:
       context: .
     volumes:
       # Adds current directory as volume.
-    - .:/app/src/
+      - .:/app/src/
     environment:
       # Enables autoreload.
       NIR_MYRMIAKA_RELOAD: "True"
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - nir_myrmiaka-db-data:/db_data/
+
+volumes:
+  nir_myrmiaka-db-data:
+    name: nir_myrmiaka-db-data

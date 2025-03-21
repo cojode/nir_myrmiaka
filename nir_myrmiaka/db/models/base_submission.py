@@ -17,6 +17,11 @@ class BaseSubmission(Base):
     created_at = mapped_column(DateTime)
     research_work_id = mapped_column(ForeignKey("base_researchwork.id"))
 
-    assignment = relationship("BaseAssignment", back_populates="base_submission")
-    research_work = relationship("BaseResearchwork", back_populates="base_submission")
-    base_file = relationship("BaseFile", uselist=True, back_populates="submission")
+    submission_topics = relationship(
+        "SubmissionTopic", uselist=True, back_populates="submission"
+    )
+    assignment = relationship("BaseAssignment", back_populates="submissions")
+    research_work = relationship(
+        "BaseResearchwork",
+        back_populates="submissions",
+    )
