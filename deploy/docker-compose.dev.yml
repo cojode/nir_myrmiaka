@@ -11,16 +11,3 @@ services:
     environment:
       # Enables autoreload.
       NIR_MYRMIAKA_RELOAD: "True"
-
-  adminer:
-    image: adminer
-    container_name: adminer
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-    volumes:
-      - nir_myrmiaka-db-data:/db_data/
-
-volumes:
-  nir_myrmiaka-db-data:
-    name: nir_myrmiaka-db-data

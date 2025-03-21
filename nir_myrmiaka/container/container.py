@@ -12,7 +12,7 @@ from functools import lru_cache
 
 from punq import Container, Scope
 
-from nir_myrmiaka.services import UserService, WorkManagementService
+from nir_myrmiaka.services import UserService, AssignmentService
 from nir_myrmiaka.settings import settings
 from nir_myrmiaka.db.database import Database
 
@@ -52,6 +52,6 @@ def _init_container() -> Container:
     )
 
     container.register(UserService, scope=Scope.singleton)
-    container.register(WorkManagementService, scope=Scope.singleton)
+    container.register(AssignmentService, scope=Scope.singleton)
 
     return container

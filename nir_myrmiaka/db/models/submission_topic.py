@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Integer, String, Text, Boolean
+from sqlalchemy import ForeignKey, Integer, Text, Boolean
 from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base

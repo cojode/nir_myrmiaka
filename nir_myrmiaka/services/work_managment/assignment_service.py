@@ -1,9 +1,8 @@
 from nir_myrmiaka.db.models.base_assignment import BaseAssignment
 from nir_myrmiaka.services.auth.auth_service import UserService
 
-from nir_myrmiaka.db.repositories.base_assignment import BaseAssignmentRepository
-from nir_myrmiaka.db.repositories.base_submission import (
-    BaseSubmissionRepository,
+from nir_myrmiaka.db.repositories.base_assignment import (
+    BaseAssignmentRepository,
 )
 
 from nir_myrmiaka.db.database import Database
@@ -11,7 +10,7 @@ from nir_myrmiaka.db.database import Database
 from datetime import datetime
 
 
-class WorkManagementService:
+class AssignmentService:
 
     _student_role_symbolic = "Student"
     _teacher_role_symbolic = "Teacher"
@@ -20,7 +19,6 @@ class WorkManagementService:
         self.db = db
         self.user_service: UserService = user_service
         self.base_assignment_repo = BaseAssignmentRepository(session=db)
-        self.base_submission_repo = BaseSubmissionRepository(session=db)
 
     async def verify_student(self, user_id):
         return await self.user_service.verify_exists_and_role_specified(
@@ -43,6 +41,7 @@ class WorkManagementService:
     async def get_accepted_students_plain(
         self, teacher_id: int
     ) -> tuple[int, dict]:
+        # ! maybe join is better overall
         teacher = await self.verify_teacher(teacher_id)
         result = []
         for student_id in {
@@ -74,6 +73,15 @@ class WorkManagementService:
         )
         return created_assignment.to_dict()
 
+    async def verify_assignment_id_exists(self, assignment_id: int):
+        target_base_assignment: BaseAssignment = (
+            await self.base_assignment_repo.find_by_id(assignment_id)
+        )
+
+        if target_base_assignment is None:
+            raise ValueError("Assignment not found")
+        return target_base_assignment
+
     async def _affect_assignment(
         self,
         teacher_id: int,
@@ -82,12 +90,9 @@ class WorkManagementService:
         is_accepted: bool | None = None,
     ) -> BaseAssignment:
         await self.verify_teacher(teacher_id)
-        target_base_assignment: BaseAssignment = (
-            await self.base_assignment_repo.find_by_id(assignment_id)
+        target_base_assignment = await self.verify_assignment_id_exists(
+            assignment_id
         )
-
-        if target_base_assignment is None:
-            raise ValueError("Assignment not found")
 
         if target_base_assignment.teacher_id != teacher_id:
             raise ValueError("Teacher is not related to this assignment")
@@ -105,11 +110,6 @@ class WorkManagementService:
             assignment_id=assignment_id,
             is_reviewed=True,
             is_accepted=True,
-        )
-
-        return await self.base_submission_repo.create(
-            assignment_id=assignment_id,
-            created_at=datetime.now(),
         )
 
     async def decline_assignment(

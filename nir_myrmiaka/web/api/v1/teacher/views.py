@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, status
 from punq import Container
 from nir_myrmiaka.container.container import init_container
 
-from nir_myrmiaka.services.work_managment.work_management_service import (
-    WorkManagementService,
+from nir_myrmiaka.services.work_managment.assignment_service import (
+    AssignmentService,
 )
 
 from .schemas import (
@@ -29,8 +29,8 @@ async def list_students(
     teacher_id: int,
     container: Container = Depends(init_container),
 ):
-    work_management_service: WorkManagementService = container.resolve(
-        WorkManagementService
+    work_management_service: AssignmentService = container.resolve(
+        AssignmentService
     )
     try:
         count, values = (
@@ -52,8 +52,8 @@ async def accept_assignment(
     payload: AffectAssignmentRequest,
     container: Container = Depends(init_container),
 ):
-    work_management_service: WorkManagementService = container.resolve(
-        WorkManagementService
+    work_management_service: AssignmentService = container.resolve(
+        AssignmentService
     )
     try:
         return AcceptAssignmentResponse(
@@ -74,8 +74,8 @@ async def decline_assignment(
     payload: AffectAssignmentRequest,
     container: Container = Depends(init_container),
 ):
-    work_management_service: WorkManagementService = container.resolve(
-        WorkManagementService
+    work_management_service: AssignmentService = container.resolve(
+        AssignmentService
     )
 
     try:
@@ -97,8 +97,8 @@ async def review_assignment(
     payload: AffectAssignmentRequest,
     container: Container = Depends(init_container),
 ):
-    work_management_service: WorkManagementService = container.resolve(
-        WorkManagementService
+    work_management_service: AssignmentService = container.resolve(
+        AssignmentService
     )
 
     try:
