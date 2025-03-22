@@ -18,10 +18,14 @@ class BaseSubmission(Base):
     researchwork_id = mapped_column(ForeignKey("base_researchwork.id"))
 
     submission_topics = relationship(
-        "SubmissionTopic", uselist=True, back_populates="submission"
+        "SubmissionTopic",
+        uselist=True,
+        back_populates="submission",
+        lazy="joined",
     )
-    assignment = relationship("BaseAssignment", back_populates="submissions")
+    assignment = relationship(
+        "BaseAssignment", back_populates="submissions", lazy="joined"
+    )
     research_work = relationship(
-        "BaseResearchwork",
-        back_populates="submissions",
+        "BaseResearchwork", back_populates="submissions", lazy="joined"
     )

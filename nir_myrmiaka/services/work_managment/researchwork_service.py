@@ -16,9 +16,10 @@ class ResearchworkService:
         self.base_researchwork_repo = BaseResearchworkRepository(session=db)
 
     async def get_researchwork_by_id(self, researchwork_id: int) -> dict:
-        return await self.base_researchwork_repo.find_by_id(
+        researchwork = await self.base_researchwork_repo.find_by_id(
             researchwork_id
-        ).to_dict()
+        )
+        return researchwork.to_dict()
 
     async def verify_researchwork_id_exists(
         self, researchwork_id: int
@@ -33,7 +34,7 @@ class ResearchworkService:
         return target_researchwork
 
     async def list_researchworks(self) -> list[dict]:
-        return await [
+        return [
             item.to_dict()
             for item in await self.base_researchwork_repo.find_all()
         ]

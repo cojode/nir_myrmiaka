@@ -19,9 +19,11 @@ class SubmissionTopic(Base):
     topic_id = mapped_column(ForeignKey("base_topic.id"))
 
     submission = relationship(
-        "BaseSubmission", back_populates="submission_topics"
+        "BaseSubmission", back_populates="submission_topics", lazy="joined"
     )
-    topic = relationship("BaseTopic", back_populates="submission_topics")
+    topic = relationship(
+        "BaseTopic", back_populates="submission_topics", lazy="joined"
+    )
 
     files = relationship(
         "BaseFile", uselist=True, back_populates="submission_topic"

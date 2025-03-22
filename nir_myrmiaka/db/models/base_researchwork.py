@@ -23,5 +23,8 @@ class BaseResearchwork(Base):
         lazy="joined",
     )
     submissions = relationship(
-        "BaseSubmission", uselist=True, back_populates="research_work"
+        "BaseSubmission",
+        uselist=True,
+        back_populates="research_work",
+        lazy="joined",
     )

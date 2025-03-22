@@ -7,12 +7,17 @@ from nir_myrmiaka.services.work_managment.assignment_service import (
     AssignmentService,
 )
 
+from nir_myrmiaka.services.work_managment.submission_service import (
+    SubmissionService,
+)
+
 from .schemas import (
     AcceptAssignmentResponse,
     DeclineAssignmentResponse,
     ReviewAssignmentResponse,
     AffectAssignmentRequest,
     ListStudentsResponse,
+    CreateSubmissionResponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
@@ -107,5 +112,30 @@ async def review_assignment(
                 payload.teacher.user_id, payload.assignment_id
             )
         )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.post(
+    "/create-submission",
+    status_code=status.HTTP_200_OK,
+    response_model=CreateSubmissionResponse,
+)
+async def create_submission(
+    assignment_id: int,
+    researchwork_id: int,
+    container: Container = Depends(init_container),
+):
+    submission_service: SubmissionService = container.resolve(
+        SubmissionService
+    )
+
+    submission = await submission_service.create_submission(
+        assignment_id=assignment_id, researchwork_id=researchwork_id
+    )
+    print(submission)
+
+    try:
+        return CreateSubmissionResponse(data=submission)
     except ValueError as e:
         raise_http_error_from_exception(e)

@@ -105,12 +105,13 @@ class AssignmentService:
         return await self.base_assignment_repo.save(target_base_assignment)
 
     async def accept_assignment(self, teacher_id, assignment_id):
-        await self._affect_assignment(
+        accepted_assignment = await self._affect_assignment(
             teacher_id=teacher_id,
             assignment_id=assignment_id,
             is_reviewed=True,
             is_accepted=True,
         )
+        return accepted_assignment.to_dict()
 
     async def decline_assignment(
         self, teacher_id: int, assignment_id: int

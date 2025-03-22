@@ -1,13 +1,11 @@
 from nir_myrmiaka.db.database import Database
 
 from nir_myrmiaka.db.repositories.base_submission import (
-    BaseSubmission,
     BaseSubmissionRepository,
 )
 
 from nir_myrmiaka.db.repositories.submission_topic import (
     SubmissionTopicRepository,
-    SubmissionTopic,
 )
 
 from nir_myrmiaka.services.work_managment.assignment_service import (
@@ -22,10 +20,6 @@ from datetime import datetime
 
 
 class SubmissionService:
-
-    _student_role_symbolic = "Student"
-    _teacher_role_symbolic = "Teacher"
-
     def __init__(
         self,
         db: Database,
@@ -38,6 +32,16 @@ class SubmissionService:
 
         self.submission_topic_repo = SubmissionTopicRepository(session=db)
         self.base_submission_repo = BaseSubmissionRepository(session=db)
+
+    async def verify_base_submission_by_id(self, base_submssion_id: int):
+        base_submission = await self.base_submission_repo.find_by_id(
+            base_submssion_id
+        )
+        if not base_submission:
+            raise ValueError(
+                f"Submission with provided id [{base_submssion_id}] does not exists."
+            )
+        return base_submission.to_dict()
 
     async def create_submission(
         self, assignment_id: int, researchwork_id: int
@@ -68,3 +72,4 @@ class SubmissionService:
                     "topic_id": topic.get("id", None),
                 }
             )
+        return await self.verify_base_submission_by_id(base_submission.id)
