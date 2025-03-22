@@ -25,6 +25,7 @@ pymongo = "^4.8.0"
 loguru = "^0"
 passlib = "^1.7.4"
 punq = "^0.7.0"
+alembic = "^1.15.1"
 
 
 [tool.poetry.group.dev.dependencies]

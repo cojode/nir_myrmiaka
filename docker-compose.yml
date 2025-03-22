@@ -6,9 +6,6 @@ services:
     image: nir_myrmiaka:${NIR_MYRMIAKA_VERSION:-latest}
     env_file:
       - .env
-    environment:
-      NIR_MYRMIAKA_HOST: 0.0.0.0
-      NIR_MYRMIAKA_DB_FILE: /db_data/db.sqlite3
     volumes:
       - nir_myrmiaka-db-data:/db_data/
 
