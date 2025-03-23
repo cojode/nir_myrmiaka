@@ -68,6 +68,3 @@ class SubmissionService(BaseCRUDService[BaseSubmission]):
             assignment_id=assignmnet_id
         )
         return count, [submission.to_dict() for submission in submissions]
-
-    async def get_submission_by_id(self, submission_id: int) -> dict[str, any]:
-        return await self._get_model_by_id(submission_id)

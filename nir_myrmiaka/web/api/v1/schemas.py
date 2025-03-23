@@ -108,6 +108,7 @@ class PlainUserProfileModel(BaseUserProfileModel):
 class BaseSubmissionModel(BaseModel):
     id: int
     semester: Optional[int]
+    submission_title: str
     created_at: Optional[datetime.datetime]
 
 

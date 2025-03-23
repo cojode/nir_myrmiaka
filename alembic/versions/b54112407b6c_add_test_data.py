@@ -1,10 +1,11 @@
 """add_test_data
 
-Revision ID: 1628d3bc4a1b
-Revises: f10b2c67d183
-Create Date: 2025-03-22 13:08:21.577802
+Revision ID: b54112407b6c
+Revises: 32bad1c5d369
+Create Date: 2025-03-23 11:16:09.260248
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -12,16 +13,23 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1628d3bc4a1b'
-down_revision: Union[str, None] = 'f10b2c67d183'
+revision: str = "b54112407b6c"
+down_revision: Union[str, None] = "32bad1c5d369"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+
 def upgrade():
     # Insert static data into the users_group table
-    op.execute("INSERT INTO users_group (id, group_name) VALUES (1, 'test_group_1');")
-    op.execute("INSERT INTO users_group (id, group_name) VALUES (2, 'test_group_2');")
-    op.execute("INSERT INTO users_group (id, group_name) VALUES (3, 'test_group_3');")
+    op.execute(
+        "INSERT INTO users_group (id, group_name) VALUES (1, 'test_group_1');"
+    )
+    op.execute(
+        "INSERT INTO users_group (id, group_name) VALUES (2, 'test_group_2');"
+    )
+    op.execute(
+        "INSERT INTO users_group (id, group_name) VALUES (3, 'test_group_3');"
+    )
 
     # Insert static data into the base_researchwork table
     op.execute(
@@ -188,6 +196,7 @@ def upgrade():
         VALUES (22, 'Дневник', 5);
     """
     )
+
 
 def downgrade():
     # Remove the static data

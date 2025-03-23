@@ -8,7 +8,6 @@ class SubmissionTopic(Base):
     __tablename__ = "submission_topic"
 
     id = mapped_column(Integer, primary_key=True)
-    comment = mapped_column(Text)
     is_accepted = mapped_column(Boolean)
     is_reviewed = mapped_column(Boolean)
 
@@ -17,6 +16,14 @@ class SubmissionTopic(Base):
     )
 
     topic_id = mapped_column(ForeignKey("base_topic.id"))
+    comment_id = mapped_column(ForeignKey("submission_topic_comment.id"))
+
+    comments = relationship(
+        "SubmissionTopicComment",
+        uselist=True,
+        back_populates="submission_topic",
+        lazy="joined",
+    )
 
     submission = relationship(
         "BaseSubmission", back_populates="submission_topics", lazy="joined"

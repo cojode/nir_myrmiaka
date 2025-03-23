@@ -24,51 +24,43 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
         topics = await self.repo.find_all(submission_id=submission_id)
         return len(topics), [topic.to_dict() for topic in topics]
 
-    # async def _affect_assignment(
-    #     self,
-    #     teacher_id: int,
-    #     assignment_id: int,
-    #     is_reviewed: bool | None = None,
-    #     is_accepted: bool | None = None,
-    # ) -> dict:
-    #     await self.verify_teacher(teacher_id)
-    #     assignment = await self.get_assignment_by_id(assignment_id)
-    #     if assignment["teacher_id"] != teacher_id:
-    #         raise ValueError("Teacher is not related to this assignment")
+    async def get_submission_topic_by_id(
+        self, submission_topic_id: int
+    ) -> dict:
+        return await self._get_model_by_id(id=submission_topic_id)
 
-    #     update_data = {}
-    #     if is_reviewed is not None:
-    #         update_data["is_reviewed"] = is_reviewed
-    #     if is_accepted is not None:
-    #         update_data["is_accepted"] = is_accepted
+    async def _affect_submission_topic(
+        self,
+        submission_topic_id: int,
+        is_reviewed: bool | None = None,
+        is_accepted: bool | None = None,
+    ) -> dict:
+        await self.get_submission_topic_by_id(submission_topic_id)
 
-    #     return await self.update_assignment(assignment_id, **update_data)
+        update_data = {}
+        if is_reviewed is not None:
+            update_data["is_reviewed"] = is_reviewed
+        if is_accepted is not None:
+            update_data["is_accepted"] = is_accepted
 
-    # async def accept_assignment(
-    #     self, teacher_id: int, assignment_id: int
-    # ) -> dict:
-    #     return await self._affect_assignment(
-    #         teacher_id=teacher_id,
-    #         assignment_id=assignment_id,
-    #         is_reviewed=True,
-    #         is_accepted=True,
-    #     )
+        return await self._update_model(submission_topic_id, **update_data)
 
-    # async def decline_assignment(
-    #     self, teacher_id: int, assignment_id: int
-    # ) -> dict:
-    #     return await self._affect_assignment(
-    #         teacher_id=teacher_id,
-    #         assignment_id=assignment_id,
-    #         is_reviewed=True,
-    #         is_accepted=False,
-    #     )
+    async def accept_submission_topic(self, submission_topic_id: int) -> dict:
+        return await self._affect_submission_topic(
+            submission_topic_id=submission_topic_id,
+            is_reviewed=True,
+            is_accepted=True,
+        )
 
-    # async def review_assignment(
-    #     self, teacher_id: int, assignment_id: int
-    # ) -> dict:
-    #     return await self._affect_assignment(
-    #         teacher_id=teacher_id,
-    #         assignment_id=assignment_id,
-    #         is_reviewed=True,
-    #     )
+    async def decline_submission_topic(self, submission_topic_id: int) -> dict:
+        return await self._affect_submission_topic(
+            submission_topic_id=submission_topic_id,
+            is_reviewed=True,
+            is_accepted=False,
+        )
+
+    async def review_submission_topic(self, submission_topic_id: int) -> dict:
+        return await self._affect_submission_topic(
+            submission_topic_id=submission_topic_id,
+            is_reviewed=True,
+        )
