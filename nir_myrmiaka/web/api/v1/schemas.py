@@ -105,9 +105,21 @@ class PlainUserProfileModel(BaseUserProfileModel):
     group_id: Optional[int]
 
 
+class BaseSubmissionModel(BaseModel):
+    id: int
+    semester: Optional[int]
+    created_at: Optional[datetime.datetime]
+
+
+class PlainSubmissionModel(BaseSubmissionModel):
+    assignment_id: int
+    researchwork_id: int
+
+
 class AssignmentResponseModel(BaseAssignmentResponseModel):
     student: Optional[PlainUserProfileModel]
     teacher: Optional[PlainUserProfileModel]
+    submissions: list[PlainSubmissionModel]
 
 
 class UserProfileResponseModel(BaseUserProfileModel):
@@ -137,17 +149,6 @@ class UserProfileResponseModel(BaseUserProfileModel):
         for assignment in self.assignment_supervisor[::-1]:
             if assignment.is_accepted == True:
                 return assignment
-
-
-class BaseSubmissionModel(BaseModel):
-    id: int
-    semester: Optional[int]
-    created_at: Optional[datetime.datetime]
-
-
-class PlainSubmissionModel(BaseSubmissionModel):
-    assignment_id: int
-    researchwork_id: int
 
 
 class SubmissionResponseModel(BaseSubmissionModel):
