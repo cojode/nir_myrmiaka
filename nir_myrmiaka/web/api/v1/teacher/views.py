@@ -114,7 +114,7 @@ async def review_assignment(
         raise_http_error_from_exception(e)
 
 
-@router.post(
+@router.patch(
     "/create-submission",
     status_code=status.HTTP_200_OK,
     response_model=CreateSubmissionResponse,
@@ -122,16 +122,19 @@ async def review_assignment(
 async def create_submission(
     assignment_id: int,
     researchwork_id: int,
+    submission_title: str,
     container: Container = Depends(init_container),
 ):
     submission_service: SubmissionService = container.resolve(
         SubmissionService
     )
 
-    submission = await submission_service.create_submission(
-        assignment_id=assignment_id, researchwork_id=researchwork_id
-    )
     try:
+        submission = await submission_service.create_submission(
+            assignment_id=assignment_id,
+            researchwork_id=researchwork_id,
+            submission_title=submission_title,
+        )
         return CreateSubmissionResponse(data=submission)
     except ValueError as e:
         raise_http_error_from_exception(e)

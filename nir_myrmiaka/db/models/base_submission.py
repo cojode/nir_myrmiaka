@@ -13,6 +13,7 @@ class BaseSubmission(Base):
 
     id = mapped_column(Integer, primary_key=True)
     assignment_id = mapped_column(ForeignKey("base_assignment.id"), nullable=False)
+    submission_title = mapped_column(String(100))
     semester = mapped_column(String(100))
     created_at = mapped_column(DateTime)
     researchwork_id = mapped_column(ForeignKey("base_researchwork.id"))
