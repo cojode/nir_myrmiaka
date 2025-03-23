@@ -7,6 +7,7 @@ from nir_myrmiaka.web.api.v1 import (
     student,
     teacher,
     assignment,
+    submission,
 )
 
 from nir_myrmiaka.settings import settings
@@ -20,4 +21,7 @@ api_router.include_router(student.router, prefix=f"/{settings.version}/student")
 api_router.include_router(teacher.router, prefix=f"/{settings.version}/teacher")
 api_router.include_router(
     assignment.router, prefix=f"/{settings.version}/assignment"
+)
+api_router.include_router(
+    submission.router, prefix=f"/{settings.version}/submission"
 )
