@@ -110,6 +110,8 @@ class BaseSubmissionModel(BaseModel):
     semester: Optional[int]
     submission_title: str
     created_at: Optional[datetime.datetime]
+    has_new_file: bool
+    has_new_comment: bool
 
 
 class PlainSubmissionModel(BaseSubmissionModel):
@@ -175,9 +177,18 @@ class PlainTopicModel(BaseTopicModel):
     research_work_id: int
 
 
-class BaseSubmissionTopicModel(BaseModel):
+class BaseCommentModel(BaseModel):
     id: int
     comment: Optional[str]
+    is_reviewed: bool
+
+
+class PlainCommentModel(BaseCommentModel):
+    topic_submission_id: int
+
+
+class BaseSubmissionTopicModel(BaseModel):
+    id: int
     is_accepted: Optional[bool]
     is_reviewed: Optional[bool]
 
@@ -190,7 +201,12 @@ class PlainSubmissionTopicModel(BaseSubmissionTopicModel):
 class SubmissionTopicResponseModel(BaseSubmissionTopicModel):
     submission: PlainSubmissionModel
     topic: PlainTopicModel
+    comments: Optional[PlainCommentModel]
     files: list[dict]
+
+
+class CommentResponseModel(BaseCommentModel):
+    topic_submission: PlainSubmissionTopicModel
 
 
 class SubmissionResponseModel(BaseSubmissionModel):
@@ -201,7 +217,9 @@ class SubmissionResponseModel(BaseSubmissionModel):
     @computed_field
     @property
     def is_accepted(self) -> bool:
-        for st in self.submission_topics:
-            if not st.is_accepted:
-                return False
-        return True
+        return all(st.is_accepted for st in self.submission_topics)
+
+    @computed_field
+    @property
+    def is_reviewed(self) -> bool:
+        return all(st.is_reviewed for st in self.submission_topics)

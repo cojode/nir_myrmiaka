@@ -46,7 +46,7 @@ async def list_students(
         raise_http_error_from_exception(e)
 
 
-@router.post(
+@router.patch(
     "/accept-assignment",
     status_code=status.HTTP_201_CREATED,
     response_model=AcceptAssignmentResponse,
@@ -114,7 +114,7 @@ async def review_assignment(
         raise_http_error_from_exception(e)
 
 
-@router.patch(
+@router.post(
     "/create-submission",
     status_code=status.HTTP_200_OK,
     response_model=CreateSubmissionResponse,

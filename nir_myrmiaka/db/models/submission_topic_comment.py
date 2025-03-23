@@ -9,7 +9,7 @@ class SubmissionTopicComment(Base):
 
     id = mapped_column(Integer, primary_key=True)
     comment = mapped_column(Text)
-    is_reviewed = mapped_column(Boolean)
+    is_reviewed = mapped_column(Boolean, default=False)
 
     submission_topic_id = ForeignKey("submission_topic.id")
 
