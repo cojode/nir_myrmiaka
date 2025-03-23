@@ -6,6 +6,7 @@ from nir_myrmiaka.db.repositories.crud.extended import ExtendedCRUDRepository
 from abc import ABC
 
 T = TypeVar("T", bound="Base")
+R = TypeVar("T", bound="ExtendedCRUDRepository")
 
 
 class BaseCRUDService(ABC, Generic[T]):

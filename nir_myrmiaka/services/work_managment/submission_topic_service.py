@@ -6,9 +6,19 @@ from nir_myrmiaka.db.repositories.submission_topic import (
 
 from nir_myrmiaka.services.common.crud_service import BaseCRUDService
 
+from nir_myrmiaka.services.work_managment.comment_service import (
+    SubmissionTopicCommentService,
+)
+
 
 class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
-    def __init__(self, db: Database):
+
+    def __init__(
+        self,
+        db: Database,
+        submission_topic_comment_service: SubmissionTopicCommentService,
+    ):
+        self.comment_service = submission_topic_comment_service
         super().__init__(db, SubmissionTopicRepository)
 
     async def create_submission_topic(
@@ -45,14 +55,20 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
 
         return await self._update_model(submission_topic_id, **update_data)
 
-    async def accept_submission_topic(self, submission_topic_id: int) -> dict:
+    async def accept_submission_topic(
+        self, submission_topic_id: int, comment: str
+    ) -> dict:
+        await self.comment_service.create_comment(comment)
         return await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,
             is_accepted=True,
         )
 
-    async def decline_submission_topic(self, submission_topic_id: int) -> dict:
+    async def decline_submission_topic(
+        self, submission_topic_id: int, comment: str
+    ) -> dict:
+        await self.comment_service.create_comment(comment)
         return await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,

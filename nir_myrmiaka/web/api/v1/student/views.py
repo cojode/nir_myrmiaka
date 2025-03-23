@@ -6,9 +6,14 @@ from nir_myrmiaka.services.work_managment.assignment_service import (
     AssignmentService,
 )
 
+from nir_myrmiaka.services.work_managment.comment_service import (
+    SubmissionTopicCommentService,
+)
+
 from .schemas import (
     AssignmentCreateRequest,
     AssignmentResponse,
+    ReviewedCommentsReponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
@@ -36,5 +41,28 @@ async def create_assignment(
                 text=payload.text,
             )
         )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.patch(
+    "/review-submission-topic-comments",
+    status_code=status.HTTP_200_OK,
+    response_model=ReviewedCommentsReponse,
+)
+async def review_submission_topic_comments(
+    submission_id: int,
+    container: Container = Depends(init_container),
+):
+    comment_service: SubmissionTopicCommentService = container.resolve(
+        SubmissionTopicCommentService
+    )
+    try:
+        count, data = (
+            await comment_service.review_comments_by_submission_topic_id(
+                submission_id=submission_id
+            )
+        )
+        return ReviewedCommentsReponse(count=count, data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)

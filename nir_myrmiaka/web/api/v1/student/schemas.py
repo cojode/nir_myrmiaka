@@ -1,8 +1,10 @@
 from pydantic import BaseModel, Field
 from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
+    GenericListResponse,
     AssignmentResponseModel,
     IdField,
+    PlainCommentModel,
 )
 
 
@@ -20,3 +22,6 @@ class AssignmentCreateRequest(BaseModel):
 
 
 class AssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
+
+
+class ReviewedCommentsReponse(GenericResponse[PlainCommentModel]): ...

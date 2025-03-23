@@ -18,6 +18,8 @@ class SubmissionTopicCommentService(BaseCRUDService[SubmissionTopicComment]):
     async def get_comment_by_id(self, comment_id: int):
         return await self._get_model_by_id(comment_id)
 
-    async def review_comment(self, comment_id: int):
-        await self._update_model(comment_id, is_reviewed=True)
-        return await self.get_comment_by_id(comment_id=comment_id)
+    async def review_comments_by_submission_topic_id(self, submission_id: int):
+        comments = await self.repo.review_comments_by_submission_id(
+            submission_id
+        )
+        return len(comments), [comment.to_dict() for comment in comments]

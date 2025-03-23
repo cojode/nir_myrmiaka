@@ -11,6 +11,10 @@ from nir_myrmiaka.services.work_managment.submission_service import (
     SubmissionService,
 )
 
+from nir_myrmiaka.services.work_managment.submission_topic_service import (
+    SubmissionTopicService,
+)
+
 from .schemas import (
     AcceptAssignmentResponse,
     DeclineAssignmentResponse,
@@ -18,6 +22,11 @@ from .schemas import (
     AffectAssignmentRequest,
     ListStudentsResponse,
     CreateSubmissionResponse,
+    AffectSubmissionTopicRequest,
+    AffectSubmissionTopicRequestWithComment,
+    AcceptSubmissionTopicResponse,
+    DeclineSubmissionTopicResponse,
+    ReviewSubmissionTopicResponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
@@ -48,7 +57,7 @@ async def list_students(
 
 @router.patch(
     "/accept-assignment",
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_200_OK,
     response_model=AcceptAssignmentResponse,
 )
 async def accept_assignment(
@@ -136,5 +145,73 @@ async def create_submission(
             submission_title=submission_title,
         )
         return CreateSubmissionResponse(data=submission)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.patch(
+    "/accept-submission-topic",
+    status_code=status.HTTP_200_OK,
+    response_model=AcceptSubmissionTopicResponse,
+)
+async def accept_submission_topic(
+    payload: AffectSubmissionTopicRequestWithComment,
+    container: Container = Depends(init_container),
+):
+    work_management_service: SubmissionTopicService = container.resolve(
+        SubmissionTopicService
+    )
+    try:
+        return AcceptSubmissionTopicResponse(
+            data=await work_management_service.accept_submission_topic(
+                payload.submission_topic_id, payload.comment
+            )
+        )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.patch(
+    "/decline-submission-topic",
+    status_code=status.HTTP_200_OK,
+    response_model=DeclineSubmissionTopicResponse,
+)
+async def decline_submission_topic(
+    payload: AffectSubmissionTopicRequestWithComment,
+    container: Container = Depends(init_container),
+):
+    work_management_service: SubmissionTopicService = container.resolve(
+        SubmissionTopicService
+    )
+
+    try:
+        return DeclineSubmissionTopicResponse(
+            data=await work_management_service.decline_submission_topic(
+                payload.submission_topic_id, payload.comment
+            )
+        )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.patch(
+    "/review-submission-topic",
+    status_code=status.HTTP_200_OK,
+    response_model=DeclineSubmissionTopicResponse,
+)
+async def review_submission_topic(
+    payload: AffectSubmissionTopicRequest,
+    container: Container = Depends(init_container),
+):
+    work_management_service: SubmissionTopicService = container.resolve(
+        SubmissionTopicService
+    )
+
+    try:
+        return ReviewSubmissionTopicResponse(
+            data=await work_management_service.review_submission_topic(
+                payload.submission_topic_id
+            )
+        )
     except ValueError as e:
         raise_http_error_from_exception(e)
