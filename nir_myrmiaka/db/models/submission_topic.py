@@ -26,5 +26,8 @@ class SubmissionTopic(Base):
     )
 
     files = relationship(
-        "BaseFile", uselist=True, back_populates="submission_topic"
+        "BaseFile",
+        uselist=True,
+        back_populates="submission_topic",
+        lazy="joined",
     )

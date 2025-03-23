@@ -12,9 +12,14 @@ from nir_myrmiaka.services.work_managment.submission_service import (
     SubmissionService,
 )
 
+from nir_myrmiaka.services.work_managment.submission_topic_service import (
+    SubmissionTopicService,
+)
+
 __all__ = [
     "UserService",
     "AssignmentService",
     "ResearchworkService",
     "SubmissionService",
+    "SubmissionTopicService",
 ]

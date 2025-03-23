@@ -38,10 +38,8 @@ async def list_students(
         AssignmentService
     )
     try:
-        count, values = (
-            await work_management_service.get_accepted_students_plain(
-                teacher_id=teacher_id
-            )
+        count, values = await work_management_service.get_accepted_students(
+            teacher_id=teacher_id
         )
         return ListStudentsResponse(count=count, values=values)
     except ValueError as e:
@@ -133,8 +131,6 @@ async def create_submission(
     submission = await submission_service.create_submission(
         assignment_id=assignment_id, researchwork_id=researchwork_id
     )
-    print(submission)
-
     try:
         return CreateSubmissionResponse(data=submission)
     except ValueError as e:

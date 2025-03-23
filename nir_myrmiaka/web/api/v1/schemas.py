@@ -122,9 +122,14 @@ class AssignmentResponseModel(BaseAssignmentResponseModel):
     submissions: list[PlainSubmissionModel]
 
 
+class PlainGroupModel(BaseModel):
+    id: int
+    group_name: str
+
+
 class UserProfileResponseModel(BaseUserProfileModel):
 
-    group: Optional[dict]
+    group: Optional[PlainGroupModel]
     assignment_subordinate: Optional[list[PlainAssignmentResponseModel]]
     assignment_supervisor: Optional[list[PlainAssignmentResponseModel]]
 
@@ -151,7 +156,51 @@ class UserProfileResponseModel(BaseUserProfileModel):
                 return assignment
 
 
+class BaseResearchworkModel(BaseModel):
+    id: int
+    name: str
+    description: str
+
+
+class PlainResearchworkModel(BaseResearchworkModel): ...
+
+
+class BaseTopicModel(BaseModel):
+    id: int
+    name: str
+
+
+class PlainTopicModel(BaseTopicModel):
+    research_work_id: int
+
+
+class BaseSubmissionTopicModel(BaseModel):
+    id: int
+    comment: Optional[str]
+    is_accepted: Optional[bool]
+    is_reviewed: Optional[bool]
+
+
+class PlainSubmissionTopicModel(BaseSubmissionTopicModel):
+    submission_id: int
+    topic_id: int
+
+
+class SubmissionTopicResponseModel(BaseSubmissionTopicModel):
+    submission: PlainSubmissionModel
+    topic: PlainTopicModel
+    files: list[dict]
+
+
 class SubmissionResponseModel(BaseSubmissionModel):
-    submission_topics: list[dict]
+    submission_topics: list[PlainSubmissionTopicModel]
     assignment: PlainAssignmentResponseModel
-    research_work: dict
+    research_work: PlainResearchworkModel
+
+    @computed_field
+    @property
+    def is_accepted(self) -> bool:
+        for st in self.submission_topics:
+            if not st.is_accepted:
+                return False
+        return True

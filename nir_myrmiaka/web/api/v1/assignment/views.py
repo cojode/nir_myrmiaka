@@ -23,10 +23,11 @@ async def get_assignment(
     )
 
     try:
-        assignment = await assignment_service.get_assignment(
-            assignment_id=assignment_id
+        return GetAssignmentResponse(
+            data=await assignment_service.get_assignment_by_id(
+                assignment_id=assignment_id
+            )
         )
-        return GetAssignmentResponse(data=assignment)
     except ValueError as e:
         raise_http_error_from_exception(e)
 
@@ -46,8 +47,8 @@ async def get_assignment_submissions(
 
     try:
         count, submissions = (
-            await submission_service.get_submissions_by_assigment_id(
-                assignmennt_id=assignment_id
+            await submission_service.get_submissions_by_assignment_id(
+                assignmnet_id=assignment_id
             )
         )
         return AssignmentSubmissionsResponse(count=count, values=submissions)
