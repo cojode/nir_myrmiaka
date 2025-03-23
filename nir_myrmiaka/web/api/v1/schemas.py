@@ -7,6 +7,8 @@ from pydantic import (
 from typing import Optional, TypeVar, Generic
 import datetime
 
+from nir_myrmiaka.log import logger
+
 T = TypeVar("T")
 
 """
@@ -16,6 +18,12 @@ Generic or common schemas for endpoints
 
 class GenericResponseMessageField(BaseModel):
     msg: str = Field(default="success", example="success")
+
+    def __init__(self, **kwargs):
+        logger.info(
+            f"Attempting to return response with service output: {kwargs}"
+        )
+        super().__init__(**kwargs)
 
 
 class GenericResponse(GenericResponseMessageField, Generic[T]):
@@ -129,3 +137,20 @@ class UserProfileResponseModel(BaseUserProfileModel):
         for assignment in self.assignment_supervisor[::-1]:
             if assignment.is_accepted == True:
                 return assignment
+
+
+class BaseSubmissionModel(BaseModel):
+    id: int
+    semester: Optional[int]
+    created_at: Optional[datetime.datetime]
+
+
+class PlainSubmissionModel(BaseSubmissionModel):
+    assignment_id: int
+    researchwork_id: int
+
+
+class SubmissionResponseModel(BaseSubmissionModel):
+    submission_topics: list[dict]
+    assignment: PlainAssignmentResponseModel
+    research_work: dict

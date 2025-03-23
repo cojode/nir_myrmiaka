@@ -2,25 +2,11 @@ from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     GenericListResponse,
     AssignmentResponseModel,
-    PlainAssignmentResponseModel,
     IdField,
     PlainUserProfileModel,
+    SubmissionResponseModel,
 )
 from pydantic import BaseModel
-from typing import Optional
-import datetime
-
-class BaseSubmissionResponseModel(BaseModel):
-    id: int
-    assignment: PlainAssignmentResponseModel
-    semester: Optional[int]
-    created_at: Optional[datetime.datetime]
-    research_work: dict
-    submission_topics: list[dict]
-
-    class Config:
-        from_attributes = True
-
 
 class AffectAssignmentRequest(BaseModel):
     teacher: IdField
@@ -37,13 +23,9 @@ class BrowseAssignmentsResponse(
 
 class DeclineAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
 
-
 class ReviewAssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
-
 
 class ListStudentsResponse(GenericListResponse[PlainUserProfileModel]): ...
 
 
-class CreateSubmissionResponse(
-    GenericResponse[BaseSubmissionResponseModel]
-): ...
+class CreateSubmissionResponse(GenericResponse[SubmissionResponseModel]): ...

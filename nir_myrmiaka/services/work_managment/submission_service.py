@@ -41,14 +41,12 @@ class SubmissionService:
             raise ValueError(
                 f"Submission with provided id [{base_submssion_id}] does not exists."
             )
-        return base_submission.to_dict()
+        return base_submission
 
     async def create_submission(
         self, assignment_id: int, researchwork_id: int
     ):
-        await self.assignment_service.verify_assignment_id_exists(
-            assignment_id
-        )
+        await self.assignment_service.get_existing_assignment(assignment_id)
 
         research_work = (
             await self.researchwork_service.verify_researchwork_id_exists(
@@ -72,4 +70,18 @@ class SubmissionService:
                     "topic_id": topic.get("id", None),
                 }
             )
-        return await self.verify_base_submission_by_id(base_submission.id)
+
+        refreshed_base_submission = await self.verify_base_submission_by_id(
+            base_submission.id
+        )
+        return refreshed_base_submission.to_dict()
+
+    async def get_submissions_by_assigment_id(
+        self, assignmennt_id: int
+    ) -> tuple[int, dict]:
+        target_submissions = await self.base_submission_repo.find_all(
+            assignment_id=assignmennt_id
+        )
+        return len(target_submissions), [
+            submission.to_dict() for submission in target_submissions
+        ]

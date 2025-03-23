@@ -73,7 +73,7 @@ class AssignmentService:
         )
         return created_assignment.to_dict()
 
-    async def verify_assignment_id_exists(self, assignment_id: int):
+    async def get_existing_assignment(self, assignment_id: int):
         target_base_assignment: BaseAssignment = (
             await self.base_assignment_repo.find_by_id(assignment_id)
         )
@@ -81,6 +81,10 @@ class AssignmentService:
         if target_base_assignment is None:
             raise ValueError("Assignment not found")
         return target_base_assignment
+
+    async def get_assignment(self, assignment_id: int) -> dict:
+        assignment = await self.get_existing_assignment(assignment_id)
+        return assignment.to_dict()
 
     async def _affect_assignment(
         self,
@@ -90,7 +94,7 @@ class AssignmentService:
         is_accepted: bool | None = None,
     ) -> BaseAssignment:
         await self.verify_teacher(teacher_id)
-        target_base_assignment = await self.verify_assignment_id_exists(
+        target_base_assignment = await self.get_existing_assignment(
             assignment_id
         )
 
