@@ -16,6 +16,10 @@ from nir_myrmiaka.services.work_managment.submission_topic_service import (
     SubmissionTopicService,
 )
 
+from nir_myrmiaka.services.work_managment.comment_service import (
+    SubmissionTopicCommentService,
+)
+
 __all__ = [
     "UserService",
     "AssignmentService",

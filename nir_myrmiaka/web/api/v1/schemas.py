@@ -201,7 +201,7 @@ class PlainSubmissionTopicModel(BaseSubmissionTopicModel):
 class SubmissionTopicResponseModel(BaseSubmissionTopicModel):
     submission: PlainSubmissionModel
     topic: PlainTopicModel
-    comments: Optional[PlainCommentModel]
+    comments: list[PlainCommentModel]
     files: list[dict]
 
 

@@ -18,6 +18,7 @@ from nir_myrmiaka.services import (
     ResearchworkService,
     SubmissionService,
     SubmissionTopicService,
+    SubmissionTopicCommentService,
 )
 from nir_myrmiaka.settings import settings
 from nir_myrmiaka.db.database import Database
@@ -61,6 +62,7 @@ def _init_container() -> Container:
     container.register(AssignmentService, scope=Scope.singleton)
     container.register(ResearchworkService, scope=Scope.singleton)
     container.register(SubmissionTopicService, scope=Scope.singleton)
+    container.register(SubmissionTopicCommentService, scope=Scope.singleton)
     container.register(SubmissionService, scope=Scope.singleton)
 
     return container
