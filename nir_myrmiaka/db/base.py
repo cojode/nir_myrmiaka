@@ -43,7 +43,6 @@ class Base(DeclarativeBase):
             for name, obj in insp.class_.__dict__.items():
                 if isinstance(obj, hybrid_property):
                     try:
-                        # Check if instance is attached to a session first
                         if inspect(self).persistent:
                             data[name] = self._format_value(
                                 getattr(self, name)
@@ -52,6 +51,7 @@ class Base(DeclarativeBase):
                             logger.warning(
                                 f"Skipping hybrid property {name} - instance is detached"
                             )
+                            data[name] = None
                     except Exception as e:
                         logger.warning(
                             f"Could not access hybrid property {name}: {str(e)}"
