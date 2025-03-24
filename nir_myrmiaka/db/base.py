@@ -2,6 +2,8 @@ from sqlalchemy import inspect
 from typing import Any, Dict
 from sqlalchemy.orm import DeclarativeBase
 
+from nir_myrmiaka.log import logger
+
 from nir_myrmiaka.db.meta import meta
 
 
@@ -42,6 +44,7 @@ class Base(DeclarativeBase):
                     )
             else:
                 data[attr.key] = None
+        logger.info(f"Converted model {self.__name__} to {data}")
         return data
 
     def to_plain_dict(self) -> Dict[str, Any]:

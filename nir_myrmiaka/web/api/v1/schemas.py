@@ -24,7 +24,7 @@ class GenericResponseMessageField(BaseModel):
     def __init__(self, **kwargs):
         logger.info("Attempting to return response with service output: ")
         logger.info(
-            f"{json.dumps({**kwargs}, indent=4, sort_keys=True, ensure_ascii=False)}"
+            f"\n{json.dumps({**kwargs}, indent=4, sort_keys=True, ensure_ascii=False)}"
         )
         super().__init__(**kwargs)
 
