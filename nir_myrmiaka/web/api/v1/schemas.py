@@ -9,6 +9,8 @@ import datetime
 
 from nir_myrmiaka.log import logger
 
+import json
+
 T = TypeVar("T")
 
 """
@@ -20,8 +22,9 @@ class GenericResponseMessageField(BaseModel):
     msg: str = Field(default="success", example="success")
 
     def __init__(self, **kwargs):
+        logger.info("Attempting to return response with service output: ")
         logger.info(
-            f"Attempting to return response with service output: {kwargs}"
+            f"{json.dumps({**kwargs}, indent=4, sort_keys=True, ensure_ascii=False)}"
         )
         super().__init__(**kwargs)
 

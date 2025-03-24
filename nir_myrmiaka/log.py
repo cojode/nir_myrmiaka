@@ -6,6 +6,8 @@ from loguru import logger
 
 from nir_myrmiaka.settings import settings
 
+import json
+
 from functools import wraps
 
 
@@ -47,7 +49,7 @@ def configure_logging() -> None:  # pragma: no cover
     """Configures logging."""
     intercept_handler = InterceptHandler()
 
-    logging.basicConfig(handlers=[intercept_handler], level=logging.NOTSET)
+    logging.basicConfig(handlers=[intercept_handler], level=logging.INFO)
 
     for logger_name in logging.root.manager.loggerDict:
         if logger_name.startswith("uvicorn."):
@@ -89,8 +91,4 @@ class LoggingMeta(type):
     """
 
     def __new__(cls, name, bases, dct):
-        for attr_name, attr_value in dct.items():
-            if callable(attr_value) and not attr_name.startswith("__"):
-                dct[attr_name] = log_method_calls(attr_value)
-
         return super().__new__(cls, name, bases, dct)
