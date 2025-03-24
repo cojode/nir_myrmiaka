@@ -27,7 +27,6 @@ class BaseSubmission(Base):
     )
 
     @hybrid_property
-    @property
     def has_new_file(self):
         return any(
             st.files
@@ -36,7 +35,6 @@ class BaseSubmission(Base):
         )
 
     @hybrid_property
-    @property
     def has_new_comment(self):
         return any(
             st.comments
