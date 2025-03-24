@@ -13,4 +13,6 @@ class BaseFile(Base):
 
     topic_submission_id = mapped_column(ForeignKey("submission_topic.id"))
 
-    submission_topic = relationship("SubmissionTopic", back_populates="files")
+    submission_topic = relationship(
+        "SubmissionTopic", back_populates="files", lazy="joined"
+    )
