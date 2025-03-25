@@ -113,8 +113,6 @@ class BaseSubmissionModel(BaseModel):
     semester: Optional[int]
     submission_title: str
     created_at: Optional[datetime.datetime]
-    has_new_file: Optional[bool]
-    has_new_comment: Optional[bool]
 
 
 class PlainSubmissionModel(BaseSubmissionModel):
@@ -213,6 +211,8 @@ class CommentResponseModel(BaseCommentModel):
 
 
 class SubmissionResponseModel(BaseSubmissionModel):
+    has_new_file: Optional[bool]
+    has_new_comment: Optional[bool]
     submission_topics: list[PlainSubmissionTopicModel]
     assignment: PlainAssignmentResponseModel
     research_work: PlainResearchworkModel

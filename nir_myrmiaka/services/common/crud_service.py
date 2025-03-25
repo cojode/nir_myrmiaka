@@ -29,6 +29,7 @@ class BaseCRUDService(ABC, Generic[T]):
 
     async def _create_model(self, **kwargs) -> dict:
         entity = await self.repo.create(**kwargs)
+        print(entity)
         return entity.to_dict()
 
     async def _update_model(self, id: int, **kwargs) -> dict:

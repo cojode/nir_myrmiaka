@@ -16,19 +16,20 @@ class Base(DeclarativeBase):
         insp = inspect(self)
         data = self._get_scalar_fields(insp, include_hybrid)
 
-        # Handle relationships
         for attr in insp.mapper.relationships:
             if insp.attrs[attr.key].loaded_value is not None:
                 data[attr.key] = self._process_relationship(
                     getattr(self, attr.key), attr.uselist
                 )
+            else:
+                data[attr.key] = None
 
         logger.info(f"Converted model {self} to dict")
         return data
 
     def to_plain_dict(self) -> Dict[str, Any]:
-        """Strictly scalar fields and hybrid properties only"""
-        return self._get_scalar_fields(inspect(self), include_hybrid=True)
+        """Strictly scalar fields only"""
+        return self._get_scalar_fields(inspect(self), include_hybrid=False)
 
     def _get_scalar_fields(self, insp, include_hybrid: bool) -> Dict[str, Any]:
         """Core scalar field extraction logic"""

@@ -12,9 +12,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.111.0"
+fastapi = "0.115.12"
 uvicorn = { version = "^0.30.1", extras = ["standard"] }
-pydantic = "^2"
+pydantic = {extras = ["email"], version = "^2.10.6"}
 pydantic-settings = "^2"
 yarl = "^1"
 ujson = "^5.10.0"
@@ -26,6 +26,8 @@ loguru = "^0"
 passlib = "^1.7.4"
 punq = "^0.7.0"
 alembic = "^1.15.1"
+python-multipart = "^0.0.20"
+pytest-asyncio = "^0.26.0"
 
 
 [tool.poetry.group.dev.dependencies]

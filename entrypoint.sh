@@ -27,6 +27,15 @@ if [ "$AUTOGENERATE_REVISIONS" = "true" ]; then
   alembic upgrade head
 fi
 
+# Run tests
+if [ "$RUN_TESTS" = "true" ]; then
+  echo "Running pytest..."
+  pytest tests/ -vv
+else
+  echo "Skipping tests..."
+fi
+
+
 # Run the main application command
 echo "Starting the application..."
 exec "$@"

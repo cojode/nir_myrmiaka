@@ -58,5 +58,13 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
+TEST_DIR = Path(__file__).parent.parent / "tests"
 
+
+class TestSettings:
+    DB_URL = "sqlite+aiosqlite:///:memory:"
+    ECHO_SQL = False
+
+
+test_settings = TestSettings()
 settings = Settings()

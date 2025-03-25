@@ -28,9 +28,11 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     app.state.db_session_factory = session_factory
 
 
-async def _create_tables() -> None:  # pragma: no cover
+async def create_tables(
+    db_url: str = settings.db_url,
+) -> None:  # pragma: no cover
     """Populates tables in the database."""
-    engine = create_async_engine(str(settings.db_url))
+    engine = create_async_engine(str(db_url))
     async with engine.begin() as connection:
         await connection.run_sync(meta.create_all)
     await engine.dispose()
