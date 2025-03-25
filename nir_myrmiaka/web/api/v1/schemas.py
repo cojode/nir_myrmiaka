@@ -185,7 +185,7 @@ class BaseCommentModel(BaseModel):
 
 
 class PlainCommentModel(BaseCommentModel):
-    topic_submission_id: int
+    submission_topic_id: int
 
 
 class BaseSubmissionTopicModel(BaseModel):

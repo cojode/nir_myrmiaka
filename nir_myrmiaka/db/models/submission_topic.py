@@ -20,9 +20,10 @@ class SubmissionTopic(Base):
 
     comments = relationship(
         "SubmissionTopicComment",
-        uselist=True,
         back_populates="submission_topic",
+        foreign_keys="[SubmissionTopicComment.submission_topic_id]",
         lazy="joined",
+        cascade="all, delete-orphan",
     )
 
     submission = relationship(

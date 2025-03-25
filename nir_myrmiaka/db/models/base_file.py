@@ -11,7 +11,9 @@ class BaseFile(Base):
     is_reviewed = mapped_column(Boolean, default=False)
     filename = mapped_column(String, nullable=False)
 
-    topic_submission_id = mapped_column(ForeignKey("submission_topic.id"))
+    submission_topic_id = mapped_column(
+        ForeignKey("submission_topic.id"), nullable=False
+    )
 
     submission_topic = relationship(
         "SubmissionTopic", back_populates="files", lazy="joined"

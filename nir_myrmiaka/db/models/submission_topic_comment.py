@@ -11,8 +11,13 @@ class SubmissionTopicComment(Base):
     comment = mapped_column(Text)
     is_reviewed = mapped_column(Boolean, default=False)
 
-    submission_topic_id = ForeignKey("submission_topic.id")
+    submission_topic_id = mapped_column(
+        ForeignKey("submission_topic.id"), nullable=False
+    )
 
     submission_topic = relationship(
-        "SubmissionTopic", back_populates="comments", lazy="joined"
+        "SubmissionTopic",
+        back_populates="comments",
+        lazy="joined",
+        foreign_keys=[submission_topic_id],
     )
