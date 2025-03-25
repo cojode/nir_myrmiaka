@@ -7,6 +7,7 @@ from nir_myrmiaka.db.repositories.submission_topic_comment import (
     SubmissionTopicCommentRepository,
 )
 
+import datetime
 
 class SubmissionTopicCommentService(BaseCRUDService[SubmissionTopicComment]):
     def __init__(self, db: Database):
@@ -15,6 +16,7 @@ class SubmissionTopicCommentService(BaseCRUDService[SubmissionTopicComment]):
     async def create_comment(self, comment: str, submission_topic_id: int):
         comment = await self._create_model(
             submission_topic_id=submission_topic_id,
+            created_at=datetime.datetime.today(),
             comment=comment,
             is_reviewed=False,
         )

@@ -182,6 +182,7 @@ class BaseCommentModel(BaseModel):
     id: int
     comment: Optional[str]
     is_reviewed: bool
+    created_at: Optional[datetime.datetime]
 
 
 class PlainCommentModel(BaseCommentModel):
