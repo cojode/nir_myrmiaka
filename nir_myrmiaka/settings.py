@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     # Enable uvicorn reloading
     reload: bool = False
 
+    minio_host: str = "localhost:9000"
+    minio_access_key: str = "minioadmin"
+    minio_secret_key: str = "minioadmin"
+    minio_bucket_name: str = "my-bucket"
+
     # Current environment
     environment: str = "dev"
     version: str = "v1"
@@ -42,6 +47,10 @@ class Settings(BaseSettings):
     # Variables for the database
     db_file: Path = TEMP_DIR / "db.sqlite3"
     db_echo: bool = True
+
+    @property
+    def minio_endpoint(self) -> str:
+        return f"http://{self.minio_host}"
 
     @property
     def db_url(self) -> URL:
@@ -56,6 +65,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_prefix="NIR_MYRMIAKA_",
         env_file_encoding="utf-8",
+        extra="allow",
     )
 
 TEST_DIR = Path(__file__).parent.parent / "tests"

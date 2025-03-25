@@ -10,6 +10,8 @@ from nir_myrmiaka.services.work_managment.comment_service import (
     SubmissionTopicCommentService,
 )
 
+from nir_myrmiaka.services.work_managment.file_service import BaseFileService
+
 
 class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
 
@@ -17,8 +19,10 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
         self,
         db: Database,
         submission_topic_comment_service: SubmissionTopicCommentService,
+        base_file_service: BaseFileService,
     ):
         self.comment_service = submission_topic_comment_service
+        self.base_file_service = base_file_service
         super().__init__(db, SubmissionTopicRepository)
 
     async def create_submission_topic(
@@ -79,4 +83,11 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
         return await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,
+        )
+
+    async def upload_related_file(
+        self, submission_topic_id: int, file
+    ) -> dict:
+        return await self.base_file_service.upload_and_create_file(
+            submission_topic_id=submission_topic_id, file=file
         )

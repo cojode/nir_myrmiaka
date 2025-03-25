@@ -19,6 +19,8 @@ from nir_myrmiaka.services import (
     SubmissionService,
     SubmissionTopicService,
     SubmissionTopicCommentService,
+    BaseFileService,
+    AsyncMinIOClient,
 )
 from nir_myrmiaka.settings import settings
 from nir_myrmiaka.db.database import Database
@@ -64,5 +66,7 @@ def _init_container() -> Container:
     container.register(SubmissionTopicService, scope=Scope.singleton)
     container.register(SubmissionTopicCommentService, scope=Scope.singleton)
     container.register(SubmissionService, scope=Scope.singleton)
+    container.register(AsyncMinIOClient, scope=Scope.singleton)
+    container.register(BaseFileService, scope=Scope.singleton)
 
     return container

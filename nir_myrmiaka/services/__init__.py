@@ -20,10 +20,16 @@ from nir_myrmiaka.services.work_managment.comment_service import (
     SubmissionTopicCommentService,
 )
 
+from nir_myrmiaka.services.work_managment.file_service import BaseFileService
+
+from nir_myrmiaka.services.cdn.minio_async import AsyncMinIOClient
+
 __all__ = [
     "UserService",
     "AssignmentService",
     "ResearchworkService",
     "SubmissionService",
     "SubmissionTopicService",
+    "SubmissionTopicCommentService",
+    "AsyncMinIOClient",
 ]
