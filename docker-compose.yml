@@ -9,21 +9,6 @@ services:
     volumes:
       - nir_myrmiaka-db-data:/db_data/
 
-
-  sqlite-web:
-    image: kx1t/sqlite-web
-    tty: true
-    container_name: acarsdb
-    restart: always
-    ports:
-      - 8080:8080
-    environment:
-      - SQLITE_DATABASE=/db_data/db.sqlite3
-      - URL_PREFIX=/acarsdb
-      - EXTRA_ARGS=-r
-    volumes:
-      - nir_myrmiaka-db-data:/db_data/
-
 volumes:
   nir_myrmiaka-db-data:
     name: nir_myrmiaka-db-data
