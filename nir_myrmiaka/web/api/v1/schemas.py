@@ -142,6 +142,7 @@ class NotificationModel(BaseModel):
     created_at: datetime.datetime
     is_read: bool
     related_entity_id: Optional[int] = None
+    related_entity_model: Optional[Enum] = None
 
 
 class UserProfileResponseModel(BaseUserProfileModel):

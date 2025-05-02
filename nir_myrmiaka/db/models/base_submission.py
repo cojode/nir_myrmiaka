@@ -1,5 +1,4 @@
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, String
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base

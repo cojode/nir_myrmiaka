@@ -32,7 +32,9 @@ class BaseCRUDService(ABC, Generic[T]):
         entity = await self.repo.create(**kwargs)
         return entity.to_dict()
 
-    async def _update_model(self, id: int, **kwargs) -> dict:
+    async def _update_model(
+        self, id: int, use_plain: bool = False, **kwargs
+    ) -> dict:
         entity = await self.repo.find_by_id(id)
         if not entity:
             raise ValueError(f"Entity with id [{id}] not found")

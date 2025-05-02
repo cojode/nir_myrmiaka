@@ -14,6 +14,7 @@ from nir_myrmiaka.services.work_managment.file_service import BaseFileService
 from nir_myrmiaka.services.notify.notify_service import (
     NotificationService,
     NotificationType,
+    NotificationEntityModelType,
 )
 
 class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
@@ -85,6 +86,7 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             NotificationType.SUBMISSION_TOPIC_ACCEPTED,
             "Your submission topic has been accepted.",
             submission_topic_id,
+            NotificationEntityModelType.SUBMISSION_TOPIC,
         )
 
         return submission
@@ -103,6 +105,7 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             NotificationType.SUBMISSION_TOPIC_DECLINED,
             "Your submission topic has been declined.",
             submission_topic_id,
+            NotificationEntityModelType.SUBMISSION_TOPIC,
         )
 
         return submission
@@ -127,5 +130,6 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             NotificationType.SUBMISSION_TOPIC_FILE_ADDED,
             "A new file has been uploaded to your submission topic.",
             base_file.get("id"),
+            NotificationEntityModelType.FILE,
         )
         return base_file

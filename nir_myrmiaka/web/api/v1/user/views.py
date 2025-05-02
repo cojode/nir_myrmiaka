@@ -8,8 +8,6 @@ from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
-import json
-
 from .schemas import (
     InfoResponse,
     AllTeachersResponse,
@@ -32,7 +30,6 @@ async def get_info_user(
 
     try:
         data = await user_service.get_user_info(user_id)
-        print(data)
         return InfoResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)

@@ -1,4 +1,7 @@
-from nir_myrmiaka.db.models.notification import NotificationType
+from nir_myrmiaka.db.models.notification import (
+    NotificationType,
+    NotificationEntityModelType,
+)
 
 from nir_myrmiaka.db.repositories.notification import (
     NotificationRepository,
@@ -13,18 +16,23 @@ class NotificationService(BaseCRUDService[Notification]):
     def __init__(self, db: Database):
         super().__init__(db, NotificationRepository)
 
+    async def dismiss_notification(self, notification_id: int) -> dict:
+        return await self._update_model(notification_id, is_read=True)
+
     async def notify_user(
         self,
         user_id: int,
         notification_type: NotificationType,
         message: str,
         related_entity_id: int,
-    ) -> Notification:
+        related_entity_model: NotificationEntityModelType,
+    ) -> dict:
         """Creates a new notification for a user."""
         notification = await self._create_model(
             user_id=user_id,
             type=notification_type,
             message=message,
             related_entity_id=related_entity_id,
+            related_entity_model=related_entity_model,
         )
         return notification
