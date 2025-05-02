@@ -32,9 +32,7 @@ class BaseCRUDService(ABC, Generic[T]):
         entity = await self.repo.create(**kwargs)
         return entity.to_dict()
 
-    async def _update_model(
-        self, id: int, use_plain: bool = False, **kwargs
-    ) -> dict:
+    async def _update_model(self, id: int, **kwargs) -> dict:
         entity = await self.repo.find_by_id(id)
         if not entity:
             raise ValueError(f"Entity with id [{id}] not found")
@@ -48,3 +46,6 @@ class BaseCRUDService(ABC, Generic[T]):
         if not entity:
             raise ValueError(f"Entity with id [{id}] not found")
         await self.repo.delete(entity)
+
+    async def _delete_models_by_filter(self, **kwargs) -> None:
+        return await self.repo.delete_by_filter(**kwargs)

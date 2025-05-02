@@ -56,6 +56,11 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
     ) -> dict:
         return await self._get_model_by_id(id=submission_topic_id)
 
+    async def delete_submission_topics_by_submission_id(
+        self, submission_id: int
+    ) -> bool:
+        return await self._delete_models_by_filter(submission_id=submission_id)
+
     async def _affect_submission_topic(
         self,
         submission_topic_id: int,
