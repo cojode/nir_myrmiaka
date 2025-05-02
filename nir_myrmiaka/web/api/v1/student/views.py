@@ -103,3 +103,16 @@ async def get_file(
         return await base_file_service.get_file_by_id(file_id)
     except ValueError as e:
         raise_http_error_from_exception(e)
+
+
+@router.get("/delete/{file_id}")
+async def get_file(
+    file_id: int,
+    container: Container = Depends(init_container),
+):
+    base_file_service: BaseFileService = container.resolve(BaseFileService)
+
+    try:
+        return await base_file_service.delete_file(file_id)
+    except ValueError as e:
+        raise_http_error_from_exception(e)

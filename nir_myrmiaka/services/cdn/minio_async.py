@@ -41,6 +41,18 @@ class AsyncMinIOClient:
                     Body=await file.read(),
                 )
 
+    async def delete_file(self, object_name: str) -> bool:
+        async with self.session.create_client(
+            "s3",
+            endpoint_url=self.endpoint,
+            aws_access_key_id=self.access_key,
+            aws_secret_access_key=self.secret_key,
+        ) as client:
+            await client.delete_object(
+                Bucket=self.bucket_name, Key=object_name
+            )
+            return True
+
     async def download_file(self, object_name: str, file_path: str) -> bool:
         async with self.session.create_client(
             "s3",

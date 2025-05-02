@@ -34,7 +34,7 @@ class BaseFileService(BaseCRUDService[BaseFile]):
 
             object_name = f"files/{file_id}/{file.filename}"
 
-            # await self.minio_client.upload_file(temp_path, object_name)
+            await self.minio_client.upload_file(temp_path, object_name)
 
             return await self._create_model(
                 original_filename=file.filename,
@@ -48,6 +48,17 @@ class BaseFileService(BaseCRUDService[BaseFile]):
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+
+    async def delete_file(self, file_id: int) -> bool:
+        """Deletes file from storage and database"""
+        file = await self._get_model_by_id(file_id)
+        object_name = file.get("storage_path", None)
+
+        if object_name:
+            await self.minio_client.delete_file(object_name)
+
+        await self._delete_model(file_id)
+        return True
 
     async def get_file_by_id(self, file_id: int):
         """Retrieves file metadata with temporary download URL"""
