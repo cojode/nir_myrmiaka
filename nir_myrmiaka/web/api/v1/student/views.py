@@ -106,7 +106,7 @@ async def get_file(
 
 
 @router.get("/delete/{file_id}")
-async def get_file(
+async def delete_file(
     file_id: int,
     container: Container = Depends(init_container),
 ):
