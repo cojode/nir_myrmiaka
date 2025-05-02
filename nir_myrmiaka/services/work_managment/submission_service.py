@@ -39,7 +39,7 @@ class SubmissionService(BaseCRUDService[BaseSubmission]):
     async def create_submission(
         self, assignment_id: int, researchwork_id: int, submission_title: str
     ) -> dict:
-        await self.assignment_service.get_assignment_by_id(
+        assignment = await self.assignment_service.get_assignment_by_id(
             assignment_id=assignment_id
         )
         research_work = await self.researchwork_service.get_researchwork_by_id(
@@ -48,6 +48,8 @@ class SubmissionService(BaseCRUDService[BaseSubmission]):
 
         submission = await self._create_model(
             assignment_id=assignment_id,
+            student_id=assignment.get("student_id"),
+            teacher_id=assignment.get("teacher_id"),
             semester=None,
             submission_title=submission_title,
             created_at=datetime.today(),
@@ -56,7 +58,10 @@ class SubmissionService(BaseCRUDService[BaseSubmission]):
 
         for topic in research_work.get("base_topics", []):
             await self.submission_topic_service.create_submission_topic(
-                submission["id"], topic.get("id")
+                submission["id"],
+                topic.get("id"),
+                assignment.get("student_id"),
+                assignment.get("teacher_id"),
             )
 
         return await self.get_submission_by_id(submission["id"])

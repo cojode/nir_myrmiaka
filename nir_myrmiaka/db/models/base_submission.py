@@ -19,28 +19,15 @@ class BaseSubmission(Base):
     created_at = mapped_column(DateTime)
     researchwork_id = mapped_column(ForeignKey("base_researchwork.id"))
 
+    student_id = mapped_column(ForeignKey("user_profile.id"), nullable=False)
+    teacher_id = mapped_column(ForeignKey("user_profile.id"), nullable=False)
+
     submission_topics = relationship(
         "SubmissionTopic",
         uselist=True,
         back_populates="submission",
         lazy="joined",
     )
-
-    @hybrid_property
-    def has_new_file(self):
-        return any(
-            st.files
-            for st in self.submission_topics
-            if any(file.is_reviewed == False for file in st.files)
-        )
-
-    @hybrid_property
-    def has_new_comment(self):
-        return any(
-            st.comments
-            for st in self.submission_topics
-            if any(comment.is_reviewed == False for comment in st.comments)
-        )
 
     assignment = relationship(
         "BaseAssignment", back_populates="submissions", lazy="joined"

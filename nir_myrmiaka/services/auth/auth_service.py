@@ -56,6 +56,11 @@ class UserService(BaseCRUDService[UserProfile]):
         teachers = await self.repo.find_all(role="Teacher")
         return len(teachers), [teacher.to_dict() for teacher in teachers]
 
+    async def get_all_students(self) -> tuple[int, List[Dict[str, Any]]]:
+        """Gets all users with the 'Student' role."""
+        students = await self.repo.find_all(role="Student")
+        return len(students), [student.to_dict() for student in students]
+
     async def set_user_info(self, payload: Dict[str, Any]) -> None:
         """Updates user information."""
         target_id = payload["target"]["user_id"]

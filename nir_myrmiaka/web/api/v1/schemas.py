@@ -1,10 +1,7 @@
-from pydantic import (
-    BaseModel,
-    Field,
-    EmailStr,
-    computed_field,
-)
+from pydantic import BaseModel, Field, EmailStr, computed_field, ConfigDict
 from typing import Optional, TypeVar, Generic
+from enum import Enum
+from fastapi.encoders import jsonable_encoder
 import datetime
 
 from nir_myrmiaka.log import logger
@@ -24,7 +21,7 @@ class GenericResponseMessageField(BaseModel):
     def __init__(self, **kwargs):
         logger.info("Attempting to return response with service output: ")
         logger.info(
-            f"\n{json.dumps({**kwargs}, indent=4, sort_keys=True, ensure_ascii=False)}"
+            f"\n{json.dumps(jsonable_encoder(kwargs), indent=4, sort_keys=True, ensure_ascii=False)}"
         )
         super().__init__(**kwargs)
 
@@ -40,6 +37,11 @@ class GenericListResponse(GenericResponseMessageField, Generic[T]):
 
 class UsernameField(BaseModel):
     username: str = Field(min_length=3, max_length=50)
+
+
+class StudentTeacherIdField(BaseModel):
+    student_id: int
+    teacher_id: int
 
 
 class IdField(BaseModel):
@@ -78,9 +80,9 @@ class BaseAssignmentResponseModel(BaseModel, from_attributes=True):
         return "Принято"
 
 
-class PlainAssignmentResponseModel(BaseAssignmentResponseModel):
-    student_id: int
-    teacher_id: int
+class PlainAssignmentResponseModel(
+    BaseAssignmentResponseModel, StudentTeacherIdField
+): ...
 
 
 class HeadlessUserProfileModel(BaseModel, from_attributes=True):
@@ -88,13 +90,14 @@ class HeadlessUserProfileModel(BaseModel, from_attributes=True):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     middle_name: Optional[str] = None
+    about_me: Optional[str] = None
     group_id: Optional[int] = None
 
 
 class UserUpdateRequest(BaseModel):
     target: IdField
     data: HeadlessUserProfileModel
-
+    zalupa: Optional[bool] = False
 
 class BaseUserProfileModel(HeadlessUserProfileModel):
     id: int
@@ -115,7 +118,7 @@ class BaseSubmissionModel(BaseModel):
     created_at: Optional[datetime.datetime]
 
 
-class PlainSubmissionModel(BaseSubmissionModel):
+class PlainSubmissionModel(BaseSubmissionModel, StudentTeacherIdField):
     assignment_id: int
     researchwork_id: int
 
@@ -131,9 +134,19 @@ class PlainGroupModel(BaseModel):
     group_name: str
 
 
-class UserProfileResponseModel(BaseUserProfileModel):
+class NotificationModel(BaseModel):
+    id: int
+    user_id: int
+    type: Enum
+    message: str
+    created_at: datetime.datetime
+    is_read: bool
+    related_entity_id: Optional[int] = None
 
+
+class UserProfileResponseModel(BaseUserProfileModel):
     group: Optional[PlainGroupModel]
+    notifications: Optional[list[NotificationModel]]
     assignment_subordinate: Optional[list[PlainAssignmentResponseModel]]
     assignment_supervisor: Optional[list[PlainAssignmentResponseModel]]
 
@@ -195,7 +208,9 @@ class BaseSubmissionTopicModel(BaseModel):
     is_reviewed: Optional[bool]
 
 
-class PlainSubmissionTopicModel(BaseSubmissionTopicModel):
+class PlainSubmissionTopicModel(
+    BaseSubmissionTopicModel,
+):
     submission_id: int
     topic_id: int
 
@@ -212,8 +227,6 @@ class CommentResponseModel(BaseCommentModel):
 
 
 class SubmissionResponseModel(BaseSubmissionModel):
-    has_new_file: Optional[bool]
-    has_new_comment: Optional[bool]
     submission_topics: list[PlainSubmissionTopicModel]
     assignment: PlainAssignmentResponseModel
     research_work: PlainResearchworkModel
@@ -221,9 +234,9 @@ class SubmissionResponseModel(BaseSubmissionModel):
     @computed_field
     @property
     def is_accepted(self) -> bool:
-        return all(st.is_accepted for st in self.submission_topics)
+        return all(st.is_accepted for st in self.submission_topics[1:])
 
     @computed_field
     @property
     def is_reviewed(self) -> bool:
-        return all(st.is_reviewed for st in self.submission_topics)
+        return all(st.is_reviewed for st in self.submission_topics[1:])

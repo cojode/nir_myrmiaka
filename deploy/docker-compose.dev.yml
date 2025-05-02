@@ -7,7 +7,7 @@ services:
       context: .
     volumes:
       # Adds current directory as volume.
-      - .:/app/src/
+      - .:/app/
     environment:
       # Enables autoreload.
       NIR_MYRMIAKA_RELOAD: "True"

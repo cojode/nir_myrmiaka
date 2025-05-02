@@ -15,6 +15,9 @@ class SubmissionTopic(Base):
         ForeignKey("base_submission.id"), nullable=False
     )
 
+    student_id = mapped_column(ForeignKey("user_profile.id"), nullable=False)
+    teacher_id = mapped_column(ForeignKey("user_profile.id"), nullable=False)
+
     topic_id = mapped_column(ForeignKey("base_topic.id"))
     comment_id = mapped_column(ForeignKey("submission_topic_comment.id"))
 

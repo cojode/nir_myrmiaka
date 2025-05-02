@@ -13,6 +13,7 @@ import json
 from .schemas import (
     InfoResponse,
     AllTeachersResponse,
+    AllStudentsResponse,
     SetInfoResponse,
 )
 
@@ -31,11 +32,10 @@ async def get_info_user(
 
     try:
         data = await user_service.get_user_info(user_id)
-        print(json.dumps(data, sort_keys=True, indent=4))
+        print(data)
         return InfoResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)
-
 
 @router.patch("/set-info", status_code=status.HTTP_201_CREATED)
 async def set_info_user(
@@ -62,6 +62,24 @@ async def get_all_teachers(container: Container = Depends(init_container)):
     try:
         count, values = await user_service.get_all_teachers()
         return AllTeachersResponse(
+            count=count,
+            values=values,
+        )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.get(
+    "/all-students",
+    status_code=status.HTTP_200_OK,
+    response_model=AllStudentsResponse,
+)
+async def get_all_students(container: Container = Depends(init_container)):
+    user_service: UserService = container.resolve(UserService)
+
+    try:
+        count, values = await user_service.get_all_students()
+        return AllStudentsResponse(
             count=count,
             values=values,
         )

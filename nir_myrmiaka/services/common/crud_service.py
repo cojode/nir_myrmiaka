@@ -1,7 +1,5 @@
-from typing import Type, TypeVar, Generic, Dict, Any
+from typing import TypeVar, Generic
 from nir_myrmiaka.db.database import Database
-from functools import wraps
-from nir_myrmiaka.db.base import Base
 from nir_myrmiaka.db.repositories.crud.extended import ExtendedCRUDRepository
 from abc import ABC
 
@@ -23,9 +21,12 @@ class BaseCRUDService(ABC, Generic[T]):
     async def _verify_model_exists(self, id: int) -> dict:
         return await self._get_model_by_id(id)
 
-    async def _list_all_models(self) -> list[dict]:
-        entities = await self.repo.find_all()
+    async def _search_model_by_fields(self, **kwargs) -> list[dict]:
+        entities = await self.repo.find_by_fields(**kwargs)
         return [entity.to_dict() for entity in entities]
+
+    async def _list_all_models(self) -> list[dict]:
+        return await self._search_model_by_fields()
 
     async def _create_model(self, **kwargs) -> dict:
         entity = await self.repo.create(**kwargs)

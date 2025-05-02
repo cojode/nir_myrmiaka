@@ -24,6 +24,8 @@ from nir_myrmiaka.services.work_managment.file_service import BaseFileService
 
 from nir_myrmiaka.services.cdn.minio_async import AsyncMinIOClient
 
+from nir_myrmiaka.services.notify.notify_service import NotificationService
+
 __all__ = [
     "UserService",
     "AssignmentService",
@@ -32,4 +34,6 @@ __all__ = [
     "SubmissionTopicService",
     "SubmissionTopicCommentService",
     "AsyncMinIOClient",
+    "BaseFileService",
+    "NotificationService",
 ]

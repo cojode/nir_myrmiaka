@@ -5,7 +5,12 @@ from nir_myrmiaka.container.container import init_container
 from nir_myrmiaka.services.auth.auth_service import UserService
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
-from .schemas import RegisterResponse, LoginResponse, UserCreateRequest
+from .schemas import (
+    RegisterResponse,
+    LoginResponse,
+    UserCreateRequest,
+    LoginEssentials,
+)
 
 router = APIRouter()
 
@@ -31,12 +36,14 @@ async def register_user(
     "/login", status_code=status.HTTP_200_OK, response_model=LoginResponse
 )
 async def login_user(
-    username: str, password: str, container: Container = Depends(init_container)
+    payload: LoginEssentials, container: Container = Depends(init_container)
 ):
     user_service: UserService = container.resolve(UserService)
 
     try:
-        user_profile = await user_service.login_user(username, password)
+        user_profile = await user_service.login_user(
+            payload.username, payload.password
+        )
         return LoginResponse(data=user_profile)
 
     except ValueError as e:

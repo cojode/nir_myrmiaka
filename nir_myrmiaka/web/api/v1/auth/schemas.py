@@ -21,6 +21,9 @@ class PasswordMixinSchema(BaseModel):
 class RegisterEssentials(PasswordMixinSchema, UsernameField): ...
 
 
+class LoginEssentials(UsernameField, PasswordMixinSchema): ...
+
+
 class UserProfileCreateRequestModel(HeadlessUserUpdateRequest):
     role: Optional[str] = Field(max_length=20)
 

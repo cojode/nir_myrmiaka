@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
-    reload: bool = False
+    reload: bool = True
 
     minio_host: str = "localhost:9000"
     minio_access_key: str = "minioadmin"

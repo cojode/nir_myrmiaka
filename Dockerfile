@@ -1,7 +1,7 @@
 FROM python:3.11.4-slim-bullseye as prod
 
-# Install SQLite3 (required for running sqlite3 commands)
-RUN apt-get update && apt-get install -y sqlite3
+# Install system dependencies
+RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 RUN pip install poetry==1.8.2
@@ -10,29 +10,28 @@ RUN pip install poetry==1.8.2
 RUN poetry config virtualenvs.create false
 RUN poetry config cache-dir /tmp/poetry_cache
 
-# Copying requirements of a project
-COPY pyproject.toml poetry.lock /app/src/
-WORKDIR /app/src
+# Set working directory and copy files
+WORKDIR /app
+COPY pyproject.toml poetry.lock ./
 
-# Installing requirements (including Alembic)
-RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
+# Install main dependencies (including your package in editable mode)
+RUN --mount=type=cache,target=/tmp/poetry_cache \
+    poetry install --only main --no-interaction --no-ansi
 
-# Copying the actual application and Alembic configuration
-COPY . /app/src/
+# Copy application code
+COPY . .
 
-# Make the entrypoint script executable
-RUN chmod +x /app/src/entrypoint.sh
+# Make entrypoint executable
+RUN chmod +x entrypoint.sh
 
-# Install application dependencies
-RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
+# Set PYTHONPATH to ensure package discovery
+ENV PYTHONPATH=/app
 
-# Set the entrypoint script
-ENTRYPOINT ["sh", "/app/src/entrypoint.sh"]
-
-# Default command to run the application
-CMD ["/usr/local/bin/python", "-m", "nir_myrmiaka"]
+# Entrypoint and command (run through Poetry)
+ENTRYPOINT ["sh", "entrypoint.sh"]
+CMD ["poetry", "run", "python", "-m", "nir_myrmiaka"]
 
 FROM prod as dev
-
-# Install development dependencies
-RUN --mount=type=cache,target=/tmp/poetry_cache poetry install
+# Install dev dependencies
+RUN --mount=type=cache,target=/tmp/poetry_cache \
+    poetry install --no-interaction --no-ansi

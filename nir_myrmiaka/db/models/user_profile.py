@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Index, Integer, String, DateTime
+from sqlalchemy import ForeignKey, Index, Integer, String, DateTime, Text
 from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base
@@ -22,10 +22,19 @@ class UserProfile(Base):
     last_login = mapped_column(DateTime)
     role = mapped_column(String(20))
 
+    about_me = mapped_column(Text)
+
     group_id = mapped_column(ForeignKey("users_group.id"))
 
     group = relationship(
         "UsersGroup", back_populates="user_profile", lazy="joined"
+    )
+
+    notifications = relationship(
+        "Notification",
+        uselist=True,
+        back_populates="user",
+        lazy="joined",
     )
 
     assignment_subordinate = relationship(
