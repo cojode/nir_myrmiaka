@@ -105,8 +105,8 @@ async def get_file(
         raise_http_error_from_exception(e)
 
 
-@router.get("/delete/{file_id}")
-async def delete_file(
+@router.delete("/remove-file/")
+async def remove_file(
     file_id: int,
     container: Container = Depends(init_container),
 ):
