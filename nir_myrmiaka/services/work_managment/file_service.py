@@ -34,7 +34,7 @@ class BaseFileService(BaseCRUDService[BaseFile]):
 
             object_name = f"files/{file_id}/{file.filename}"
 
-            # await self.minio_client.upload_file(temp_path, object_name)
+            await self.minio_client.upload_file(temp_path, object_name)
 
             return await self._create_model(
                 original_filename=file.filename,
