@@ -5,6 +5,7 @@ from nir_myrmiaka.web.api.v1.schemas import (
     AssignmentResponseModel,
     IdField,
     PlainCommentModel,
+    UserGroupsModel,
 )
 
 
@@ -25,3 +26,6 @@ class AssignmentResponse(GenericResponse[AssignmentResponseModel]): ...
 
 
 class ReviewedCommentsReponse(GenericResponse[PlainCommentModel]): ...
+
+
+class AllGroupsResponse(GenericListResponse[UserGroupsModel]): ...

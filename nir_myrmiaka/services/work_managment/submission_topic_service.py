@@ -92,6 +92,10 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             "Your submission topic has been accepted.",
             [
                 (
+                    NotificationEntityModelType.SUBMISSION_TOPIC,
+                    submission_topic.get("id"),
+                ),
+                (
                     NotificationEntityModelType.SUBMISSION,
                     submission_topic.get("submission_id"),
                 ),
@@ -115,9 +119,13 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             "Your submission topic has been declined.",
             [
                 (
+                    NotificationEntityModelType.SUBMISSION_TOPIC,
+                    submission_topic.get("id"),
+                ),
+                (
                     NotificationEntityModelType.SUBMISSION,
                     submission_topic.get("submission_id"),
-                )
+                ),
             ],
         )
 
@@ -143,6 +151,10 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             NotificationType.SUBMISSION_TOPIC_FILE_ADDED,
             "A new file has been uploaded to your submission topic.",
             [
+                (
+                    NotificationEntityModelType.USER_PROFILE,
+                    submission_topic.get("student_id"),
+                ),
                 (
                     NotificationEntityModelType.SUBMISSION,
                     submission_topic.get("submission_id"),

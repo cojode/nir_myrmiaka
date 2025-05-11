@@ -252,3 +252,8 @@ class SubmissionResponseModel(BaseSubmissionModel):
     @property
     def is_reviewed(self) -> bool:
         return all(st.is_reviewed for st in self.submission_topics[1:])
+
+
+class UserGroupsModel(BaseModel):
+    id: int
+    group_name: str

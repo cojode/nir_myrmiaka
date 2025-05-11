@@ -11,7 +11,7 @@ class UsersGroup(Base):
     group_name = mapped_column(String(20), nullable=False)
 
     user_profile = relationship(
-        "UserProfile", uselist=True, back_populates="group"
+        "UserProfile", uselist=True, back_populates="group", lazy="noload"
     )
 
 

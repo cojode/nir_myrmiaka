@@ -6,6 +6,8 @@ from nir_myrmiaka.services.work_managment.assignment_service import (
     AssignmentService,
 )
 
+from nir_myrmiaka.services.work_managment.groups import UsersGroupService
+
 from nir_myrmiaka.services.work_managment.comment_service import (
     SubmissionTopicCommentService,
 )
@@ -14,6 +16,7 @@ from .schemas import (
     AssignmentCreateRequest,
     AssignmentResponse,
     ReviewedCommentsReponse,
+    AllGroupsResponse,
 )
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
@@ -64,5 +67,21 @@ async def review_submission_topic_comments(
             )
         )
         return ReviewedCommentsReponse(count=count, data=data)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.get(
+    "/list-groups",
+    status_code=status.HTTP_200_OK,
+    response_model=AllGroupsResponse,
+)
+async def list_groups(
+    container: Container = Depends(init_container),
+):
+    group_service: UsersGroupService = container.resolve(UsersGroupService)
+    try:
+        count, values = await group_service.get_all_groups()
+        return AllGroupsResponse(count=count, values=values)
     except ValueError as e:
         raise_http_error_from_exception(e)
