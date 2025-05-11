@@ -134,20 +134,31 @@ class PlainGroupModel(BaseModel):
     group_name: str
 
 
-class NotificationModel(BaseModel):
+class NotificationEntityModel(BaseModel):
+    id: int
+    entity_id: int
+    entity_model: Enum
+
+
+class BaseNotificationModel(BaseModel):
     id: int
     user_id: int
     type: Enum
     message: str
     created_at: datetime.datetime
     is_read: bool
-    related_entity_id: Optional[int] = None
-    related_entity_model: Optional[Enum] = None
+
+
+class PlainNotificationModel(BaseNotificationModel): ...
+
+
+class NotificationResponseModel(BaseNotificationModel):
+    entities: Optional[list[NotificationEntityModel]]
 
 
 class UserProfileResponseModel(BaseUserProfileModel):
     group: Optional[PlainGroupModel]
-    notifications: Optional[list[NotificationModel]]
+    notifications: Optional[list[BaseNotificationModel]]
     assignment_subordinate: Optional[list[PlainAssignmentResponseModel]]
     assignment_supervisor: Optional[list[PlainAssignmentResponseModel]]
 

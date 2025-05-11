@@ -4,6 +4,7 @@ from punq import Container
 from nir_myrmiaka.container.container import init_container
 
 from nir_myrmiaka.services.auth.auth_service import UserService
+from nir_myrmiaka.services.notify.notify_service import NotificationService
 from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
 from nir_myrmiaka.services.work_managment.file_service import BaseFileService
 from nir_myrmiaka.services.work_managment.submission_topic_service import (
@@ -17,6 +18,7 @@ from .schemas import (
     AllTeachersResponse,
     AllStudentsResponse,
     SetInfoResponse,
+    UserNotificationResponseModel,
 )
 
 router = APIRouter()
@@ -37,6 +39,29 @@ async def get_info_user(
         return InfoResponse(data=data)
     except ValueError as e:
         raise_http_error_from_exception(e)
+
+
+@router.get(
+    "/{user_id}/notifications",
+    status_code=status.HTTP_200_OK,
+    response_model=UserNotificationResponseModel,
+)
+async def get_user_notifications(
+    user_id: int, container: Container = Depends(init_container)
+):
+    notification_service: NotificationService = container.resolve(
+        NotificationService
+    )
+
+    count, values = await notification_service.get_notifications_by_user_id(
+        user_id=user_id
+    )
+
+    try:
+        return UserNotificationResponseModel(count=count, values=values)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
 
 @router.patch("/set-info", status_code=status.HTTP_201_CREATED)
 async def set_info_user(

@@ -22,7 +22,7 @@ class BaseCRUDService(ABC, Generic[T]):
         return await self._get_model_by_id(id)
 
     async def _search_model_by_fields(self, **kwargs) -> list[dict]:
-        entities = await self.repo.find_by_fields(**kwargs)
+        entities = await self.repo.find_all(**kwargs)
         return [entity.to_dict() for entity in entities]
 
     async def _list_all_models(self) -> list[dict]:

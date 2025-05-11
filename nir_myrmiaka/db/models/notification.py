@@ -30,6 +30,19 @@ class NotificationEntityModelType(PyEnum):
     FILE = "file"
 
 
+class NotificationEntity(Base):
+    __tablename__ = "notification_entities"
+
+    id = mapped_column(Integer, primary_key=True)
+    notification_id = mapped_column(Integer, ForeignKey("notifications.id"))
+    entity_id = mapped_column(Integer)
+    entity_model = mapped_column(Enum(NotificationEntityModelType))
+
+    notification = relationship(
+        "Notification", back_populates="entities", lazy="joined"
+    )
+
+
 class Notification(Base):
     __tablename__ = "notifications"
 
@@ -39,9 +52,10 @@ class Notification(Base):
     message = mapped_column(String)
     is_read = mapped_column(Boolean, default=False)
     created_at = mapped_column(DateTime, default=datetime.now)
-    related_entity_id = mapped_column(Integer)
-    related_entity_model = mapped_column(Enum(NotificationEntityModelType))
 
+    entities = relationship(
+        "NotificationEntity", back_populates="notification", lazy="joined"
+    )
     user = relationship(
         "UserProfile", back_populates="notifications", lazy="joined"
     )

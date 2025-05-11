@@ -22,6 +22,7 @@ from nir_myrmiaka.services import (
     BaseFileService,
     AsyncMinIOClient,
     NotificationService,
+    NotificationEntityService,
 )
 from nir_myrmiaka.settings import settings
 from nir_myrmiaka.db.database import Database
@@ -70,5 +71,6 @@ def _init_container() -> Container:
     container.register(AsyncMinIOClient, scope=Scope.singleton)
     container.register(BaseFileService, scope=Scope.singleton)
     container.register(NotificationService, scope=Scope.singleton)
+    container.register(NotificationEntityService, scope=Scope.singleton)
 
     return container

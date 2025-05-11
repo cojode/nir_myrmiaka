@@ -57,7 +57,6 @@ class ExtendedCRUDRepository(CRUDRepository[T]):
             if descending
             else asc(getattr(self.model, order_by))
         )
-        print("chlen", order)
         return await self.read(order_by=order, **filters)
 
     async def exists(self, **filters) -> bool:

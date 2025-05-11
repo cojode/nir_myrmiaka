@@ -24,7 +24,10 @@ from nir_myrmiaka.services.work_managment.file_service import BaseFileService
 
 from nir_myrmiaka.services.cdn.minio_async import AsyncMinIOClient
 
-from nir_myrmiaka.services.notify.notify_service import NotificationService
+from nir_myrmiaka.services.notify.notify_service import (
+    NotificationService,
+    NotificationEntityService,
+)
 
 __all__ = [
     "UserService",
@@ -36,4 +39,5 @@ __all__ = [
     "AsyncMinIOClient",
     "BaseFileService",
     "NotificationService",
+    "NotificationEntityService",
 ]
