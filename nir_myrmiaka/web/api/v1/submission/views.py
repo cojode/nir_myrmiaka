@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, status
 from punq import Container
 from nir_myrmiaka.container.container import init_container
 from nir_myrmiaka.services import SubmissionService, SubmissionTopicService
-from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
 from .schemas import (
     GetSubmissionResponse,
@@ -27,14 +26,11 @@ async def get_submission(
         SubmissionService
     )
 
-    try:
-        return GetSubmissionResponse(
-            data=await submission_service.get_submission_by_id(
-                submission_id=submission_id
-            )
+    return GetSubmissionResponse(
+        data=await submission_service.get_submission_by_id(
+            submission_id=submission_id
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.patch(
@@ -50,16 +46,13 @@ async def edit_submission(
         SubmissionService
     )
 
-    try:
-        return GetSubmissionResponse(
-            data=await submission_service.edit_submission_by_id(
-                submission_id=payload.submission_id,
-                submission_title=payload.submission_title,
-                researchwork_id=payload.researchwork_id,
-            )
+    return GetSubmissionResponse(
+        data=await submission_service.edit_submission_by_id(
+            submission_id=payload.submission_id,
+            submission_title=payload.submission_title,
+            researchwork_id=payload.researchwork_id,
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.get(
@@ -75,13 +68,9 @@ async def get_submission_topics(
         SubmissionTopicService
     )
 
-    try:
-        count, submissions = (
-            await submission_topics_service.get_submission_topics_by_submission_id(
-                submission_id=submission_id
-            )
+    count, submissions = (
+        await submission_topics_service.get_submission_topics_by_submission_id(
+            submission_id=submission_id
         )
-        return SubmissionTopicsResponse(count=count, values=submissions)
-
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
+    return SubmissionTopicsResponse(count=count, values=submissions)

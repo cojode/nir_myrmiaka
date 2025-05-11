@@ -29,8 +29,6 @@ from .schemas import (
     ReviewSubmissionTopicResponse,
 )
 
-from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
-
 router = APIRouter()
 
 
@@ -46,13 +44,10 @@ async def list_students(
     work_management_service: AssignmentService = container.resolve(
         AssignmentService
     )
-    try:
-        count, values = await work_management_service.get_accepted_students(
-            teacher_id=teacher_id
-        )
-        return ListStudentsResponse(count=count, values=values)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    count, values = await work_management_service.get_accepted_students(
+        teacher_id=teacher_id
+    )
+    return ListStudentsResponse(count=count, values=values)
 
 
 @router.patch(
@@ -67,14 +62,11 @@ async def accept_assignment(
     work_management_service: AssignmentService = container.resolve(
         AssignmentService
     )
-    try:
-        return AcceptAssignmentResponse(
-            data=await work_management_service.accept_assignment(
-                payload.teacher.user_id, payload.assignment_id
-            )
+    return AcceptAssignmentResponse(
+        data=await work_management_service.accept_assignment(
+            payload.teacher.user_id, payload.assignment_id
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.patch(
@@ -89,15 +81,11 @@ async def decline_assignment(
     work_management_service: AssignmentService = container.resolve(
         AssignmentService
     )
-
-    try:
-        return DeclineAssignmentResponse(
-            data=await work_management_service.decline_assignment(
-                payload.teacher.user_id, payload.assignment_id
-            )
+    return DeclineAssignmentResponse(
+        data=await work_management_service.decline_assignment(
+            payload.teacher.user_id, payload.assignment_id
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.patch(
@@ -112,15 +100,11 @@ async def review_assignment(
     work_management_service: AssignmentService = container.resolve(
         AssignmentService
     )
-
-    try:
-        return ReviewAssignmentResponse(
-            data=await work_management_service.review_assignment(
-                payload.teacher.user_id, payload.assignment_id
-            )
+    return ReviewAssignmentResponse(
+        data=await work_management_service.review_assignment(
+            payload.teacher.user_id, payload.assignment_id
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.post(
@@ -138,16 +122,12 @@ async def create_submission(
         SubmissionService
     )
 
-    try:
-        submission = await submission_service.create_submission(
-            assignment_id=assignment_id,
-            researchwork_id=researchwork_id,
-            submission_title=submission_title,
-        )
-        return CreateSubmissionResponse(data=submission)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
-
+    submission = await submission_service.create_submission(
+        assignment_id=assignment_id,
+        researchwork_id=researchwork_id,
+        submission_title=submission_title,
+    )
+    return CreateSubmissionResponse(data=submission)
 
 @router.patch(
     "/accept-submission-topic",
@@ -161,15 +141,11 @@ async def accept_submission_topic(
     work_management_service: SubmissionTopicService = container.resolve(
         SubmissionTopicService
     )
-    try:
-        return AcceptSubmissionTopicResponse(
-            data=await work_management_service.accept_submission_topic(
-                payload.submission_topic_id, payload.comment
-            )
+    return AcceptSubmissionTopicResponse(
+        data=await work_management_service.accept_submission_topic(
+            payload.submission_topic_id, payload.comment
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
-
+    )
 
 @router.patch(
     "/decline-submission-topic",
@@ -184,14 +160,11 @@ async def decline_submission_topic(
         SubmissionTopicService
     )
 
-    try:
-        return DeclineSubmissionTopicResponse(
-            data=await work_management_service.decline_submission_topic(
-                payload.submission_topic_id, payload.comment
-            )
+    return DeclineSubmissionTopicResponse(
+        data=await work_management_service.decline_submission_topic(
+            payload.submission_topic_id, payload.comment
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.patch(
@@ -207,11 +180,8 @@ async def review_submission_topic(
         SubmissionTopicService
     )
 
-    try:
-        return ReviewSubmissionTopicResponse(
-            data=await work_management_service.review_submission_topic(
-                payload.submission_topic_id
-            )
+    return ReviewSubmissionTopicResponse(
+        data=await work_management_service.review_submission_topic(
+            payload.submission_topic_id
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )

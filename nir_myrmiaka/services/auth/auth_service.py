@@ -6,12 +6,53 @@ from nir_myrmiaka.services.auth.security import hash_password, verify_password
 
 from nir_myrmiaka.db.database import Database
 
-from nir_myrmiaka.services.common.crud_service import BaseCRUDService
+from nir_myrmiaka.services.common.crud_service import (
+    BaseCRUDService,
+    EntityNotFoundError,
+)
+
+from nir_myrmiaka.exceptions.abc import DomainError, RepositoryError
 
 from typing import Dict, Any, List
 
-
 from datetime import datetime
+
+
+class UserServiceError(DomainError):
+    """Base exception class for user service errors."""
+
+
+class UsernameAlreadyTakenError(UserServiceError):
+    """Exception raised when a username is already taken."""
+
+    def __init__(self, username: str):
+        super().__init__(
+            message="Username already taken", detail={"username": username}
+        )
+
+
+class InvalidCredentialsError(UserServiceError):
+    """Exception raised when invalid credentials are provided."""
+
+    def __init__(self):
+        super().__init__(message="Invalid credentials")
+
+
+class UserNotFoundError(UserServiceError):
+    """Exception raised when a user is not found."""
+
+    def __init__(self, user_id: int):
+        super().__init__(message="User not found", detail={"user_id": user_id})
+
+
+class RoleMismatchError(UserServiceError):
+    """Exception raised when a user does not have the specified role."""
+
+    def __init__(self, user_id: int, role: str):
+        super().__init__(
+            message="User does not have the specified role",
+            detail={"user_id": user_id, "role": role},
+        )
 
 
 class UserService(BaseCRUDService[UserProfile]):
@@ -29,7 +70,7 @@ class UserService(BaseCRUDService[UserProfile]):
         """Registers a new user."""
         existing_user = await self.repo.find_one(username=data["username"])
         if existing_user:
-            raise ValueError("Username already taken")
+            raise UsernameAlreadyTakenError(data["username"])
 
         data["password"] = hash_password(data["password"])
         data["last_login"] = data["date_joined"] = datetime.now()
@@ -41,7 +82,7 @@ class UserService(BaseCRUDService[UserProfile]):
         """Authenticates and logs in a user."""
         user = await self.repo.find_one(username=username)
         if not user or not verify_password(password, user.password):
-            raise ValueError("Invalid credentials")
+            raise InvalidCredentialsError
 
         user.last_login = datetime.now()
         saved_user = await self.repo.save(user)
@@ -49,7 +90,10 @@ class UserService(BaseCRUDService[UserProfile]):
 
     async def get_user_info(self, user_id: int) -> Dict[str, Any]:
         """Gets detailed information about a user."""
-        return await self._get_model_by_id(user_id)
+        try:
+            return await self._get_model_by_id(user_id)
+        except EntityNotFoundError as e:
+            raise UserNotFoundError(user_id=e.entity_id) from e
 
     async def get_all_teachers(self) -> tuple[int, List[Dict[str, Any]]]:
         """Gets all users with the 'Teacher' role."""
@@ -64,7 +108,7 @@ class UserService(BaseCRUDService[UserProfile]):
     async def set_user_info(self, payload: Dict[str, Any]) -> None:
         """Updates user information."""
         target_id = payload["target"]["user_id"]
-        await self._get_model_by_id(target_id)  # Verify user exists
+        await self._get_model_by_id(target_id)
         await self.repo.update_by_filter(fields=payload["data"], id=target_id)
 
     async def verify_exists_and_role_specified(
@@ -73,7 +117,5 @@ class UserService(BaseCRUDService[UserProfile]):
         """Verifies that a user exists and has the specified role."""
         user = await self._get_model_by_id(user_id)
         if user.get("role", None) != role:
-            raise ValueError(
-                f"User with ID {user_id} does not have the specified role ({role})"
-            )
+            raise RoleMismatchError(user_id=user_id, role=role)
         return user

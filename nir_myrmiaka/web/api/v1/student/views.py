@@ -19,8 +19,6 @@ from .schemas import (
     AllGroupsResponse,
 )
 
-from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
-
 router = APIRouter()
 
 
@@ -35,17 +33,13 @@ async def create_assignment(
     work_management_service: AssignmentService = container.resolve(
         AssignmentService
     )
-
-    try:
-        return AssignmentResponse(
-            data=await work_management_service.create_assignment(
-                student_user_id=payload.student.user_id,
-                teacher_user_id=payload.teacher.user_id,
-                text=payload.text,
-            )
+    return AssignmentResponse(
+        data=await work_management_service.create_assignment(
+            student_user_id=payload.student.user_id,
+            teacher_user_id=payload.teacher.user_id,
+            text=payload.text,
         )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    )
 
 
 @router.patch(
@@ -60,15 +54,10 @@ async def review_submission_topic_comments(
     comment_service: SubmissionTopicCommentService = container.resolve(
         SubmissionTopicCommentService
     )
-    try:
-        count, data = (
-            await comment_service.review_comments_by_submission_topic_id(
-                submission_id=submission_id
-            )
-        )
-        return ReviewedCommentsReponse(count=count, data=data)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    count, data = await comment_service.review_comments_by_submission_topic_id(
+        submission_id=submission_id
+    )
+    return ReviewedCommentsReponse(count=count, data=data)
 
 
 @router.get(
@@ -80,8 +69,5 @@ async def list_groups(
     container: Container = Depends(init_container),
 ):
     group_service: UsersGroupService = container.resolve(UsersGroupService)
-    try:
-        count, values = await group_service.get_all_groups()
-        return AllGroupsResponse(count=count, values=values)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    count, values = await group_service.get_all_groups()
+    return AllGroupsResponse(count=count, values=values)

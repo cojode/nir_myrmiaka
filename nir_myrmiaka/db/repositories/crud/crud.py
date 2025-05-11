@@ -9,9 +9,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import SQLAlchemyError
 
 from nir_myrmiaka.db.database import Database
-from nir_myrmiaka.db.repositories.crud.exc import (
-    RepositoryError,
-)
+from nir_myrmiaka.exceptions.abc import RepositoryError
 
 T = TypeVar("T")
 
@@ -25,10 +23,8 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         :param entity: Optional instance of the model to create.
         :param kwargs: Additional fields to create a new instance if entity is not provided.
         :return: The created instance of the entity.
-        :raises UniqueConstraintViolationError: If a unique constraint is violated.
         :raises RepositoryError: If the creation fails due to other database issues.
         """
-        pass
 
     @abstractmethod
     async def read(
@@ -47,7 +43,6 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         :return: List of entities matching the conditions.
         :raises RepositoryError: If the read operation fails.
         """
-        pass
 
     @abstractmethod
     async def update(self, fields: Dict[str, Any], **filters: Any) -> int:
@@ -60,7 +55,6 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         :raises ValueError: If no fields are provided for updating.
         :raises RepositoryError: If the update operation fails.
         """
-        pass
 
     @abstractmethod
     async def delete(self, entity: Optional[T] = None, **filters: Any) -> int:
@@ -71,7 +65,6 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         :return: Number of rows affected by the delete operation.
         :raises RepositoryError: If the delete operation fails.
         """
-        pass
 
     @abstractmethod
     async def save(self, entity: T) -> T:
@@ -82,7 +75,6 @@ class AbstractCRUDRepository(ABC, Generic[T]):
         :return: The saved instance of the entity.
         :raises RepositoryError: If the save operation fails.
         """
-        pass
 
 
 T = TypeVar("T")

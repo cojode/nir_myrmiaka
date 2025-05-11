@@ -7,6 +7,32 @@ from nir_myrmiaka.db.database import Database
 from nir_myrmiaka.services.auth.auth_service import UserService
 from nir_myrmiaka.services.common.crud_service import BaseCRUDService
 
+from nir_myrmiaka.exceptions.abc import DomainError
+
+
+class AssignmentServiceError(DomainError):
+    """Base exception class for assignment service errors."""
+
+
+class AlreadyAcceptedAssignmentError(AssignmentServiceError):
+    """Exception raised when a student already has an accepted assignment."""
+
+    def __init__(self, student_id: int):
+        super().__init__(
+            message="Student already has an accepted assignment",
+            detail={"student_id": student_id},
+        )
+
+
+class UnrelatedAssignmentError(AssignmentServiceError):
+    """Exception raised when a teacher is not related to the assignment."""
+
+    def __init__(self, teacher_id: int, assignment_id: int):
+        super().__init__(
+            message="Teacher is not related to this assignment",
+            detail={"teacher_id": teacher_id, "assignment_id": assignment_id},
+        )
+
 
 class AssignmentService(BaseCRUDService[BaseAssignment]):
     _student_role_symbolic = "Student"
@@ -25,9 +51,7 @@ class AssignmentService(BaseCRUDService[BaseAssignment]):
         user_profile = await self.verify_student(user_id)
         for assignment in user_profile.get("assignment_subordinate", []):
             if assignment.get("is_accepted", None):
-                raise ValueError(
-                    "Student has an accepted assignment; no new assignment allowed"
-                )
+                raise AlreadyAcceptedAssignmentError(student_id=user_id)
 
     async def verify_teacher(self, user_id: int):
         return await self.user_service.verify_exists_and_role_specified(
@@ -74,7 +98,9 @@ class AssignmentService(BaseCRUDService[BaseAssignment]):
         await self.verify_teacher(teacher_id)
         assignment = await self.get_assignment_by_id(assignment_id)
         if assignment["teacher_id"] != teacher_id:
-            raise ValueError("Teacher is not related to this assignment")
+            raise UnrelatedAssignmentError(
+                teacher_id=teacher_id, assignment_id=assignment_id
+            )
 
         update_data = {}
         if is_reviewed is not None:

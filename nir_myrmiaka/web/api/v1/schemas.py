@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr, computed_field, ConfigDict
+from pydantic import BaseModel, Field, EmailStr, computed_field
 from typing import Optional, TypeVar, Generic
 from enum import Enum
 from fastapi.encoders import jsonable_encoder
@@ -14,23 +14,34 @@ T = TypeVar("T")
 Generic or common schemas for endpoints
 """
 
-
 class GenericResponseMessageField(BaseModel):
     msg: str = Field(default="success", example="success")
 
+
+class ApplicationErrorResponse(GenericResponseMessageField):
+    error: Enum
+    msg: str = Field(default="error", example="error")
+    detail: Optional[dict] = Field(None)
+
+
+class ServiceOutputLoggerMixin:
     def __init__(self, **kwargs):
-        logger.info("Attempting to return response with service output: ")
-        logger.info(
+        logger.debug("Attempting to return response with service output: ")
+        logger.debug(
             f"\n{json.dumps(jsonable_encoder(kwargs), indent=4, sort_keys=True, ensure_ascii=False)}"
         )
         super().__init__(**kwargs)
 
 
-class GenericResponse(GenericResponseMessageField, Generic[T]):
+class GenericResponse(
+    GenericResponseMessageField, ServiceOutputLoggerMixin, Generic[T]
+):
     data: Optional[T]
 
 
-class GenericListResponse(GenericResponseMessageField, Generic[T]):
+class GenericListResponse(
+    GenericResponseMessageField, ServiceOutputLoggerMixin, Generic[T]
+):
     count: int
     values: list[T]
 

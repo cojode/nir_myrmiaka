@@ -11,8 +11,6 @@ from nir_myrmiaka.services.work_managment.submission_topic_service import (
     SubmissionTopicService,
 )
 
-from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
-
 from .schemas import (
     InfoResponse,
     AllTeachersResponse,
@@ -33,13 +31,8 @@ async def get_info_user(
     user_id: int, container: Container = Depends(init_container)
 ):
     user_service: UserService = container.resolve(UserService)
-
-    try:
-        data = await user_service.get_user_info(user_id)
-        return InfoResponse(data=data)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
-
+    data = await user_service.get_user_info(user_id)
+    return InfoResponse(data=data)
 
 @router.get(
     "/{user_id}/notifications",
@@ -56,11 +49,7 @@ async def get_user_notifications(
     count, values = await notification_service.get_notifications_by_user_id(
         user_id=user_id
     )
-
-    try:
-        return UserNotificationResponseModel(count=count, values=values)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    return UserNotificationResponseModel(count=count, values=values)
 
 
 @router.patch("/set-info", status_code=status.HTTP_201_CREATED)
@@ -70,11 +59,8 @@ async def set_info_user(
 ):
     user_service: UserService = container.resolve(UserService)
 
-    try:
-        await user_service.set_user_info(payload.model_dump())
-        return SetInfoResponse(data=None)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    await user_service.set_user_info(payload.model_dump())
+    return SetInfoResponse(data=None)
 
 
 @router.get(
@@ -85,14 +71,11 @@ async def set_info_user(
 async def get_all_teachers(container: Container = Depends(init_container)):
     user_service: UserService = container.resolve(UserService)
 
-    try:
-        count, values = await user_service.get_all_teachers()
-        return AllTeachersResponse(
-            count=count,
-            values=values,
-        )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    count, values = await user_service.get_all_teachers()
+    return AllTeachersResponse(
+        count=count,
+        values=values,
+    )
 
 
 @router.get(
@@ -102,16 +85,11 @@ async def get_all_teachers(container: Container = Depends(init_container)):
 )
 async def get_all_students(container: Container = Depends(init_container)):
     user_service: UserService = container.resolve(UserService)
-
-    try:
-        count, values = await user_service.get_all_students()
-        return AllStudentsResponse(
-            count=count,
-            values=values,
-        )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
-
+    count, values = await user_service.get_all_students()
+    return AllStudentsResponse(
+        count=count,
+        values=values,
+    )
 
 @router.post("/upload")
 async def upload_file(
@@ -122,13 +100,9 @@ async def upload_file(
     submission_topic_service: SubmissionTopicService = container.resolve(
         SubmissionTopicService
     )
-
-    try:
-        return await submission_topic_service.upload_related_file(
-            submission_topic_id=submission_topic_id, file=file
-        )
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    return await submission_topic_service.upload_related_file(
+        submission_topic_id=submission_topic_id, file=file
+    )
 
 
 @router.get("/download/{file_id}")
@@ -138,10 +112,7 @@ async def get_file(
 ):
     base_file_service: BaseFileService = container.resolve(BaseFileService)
 
-    try:
-        return await base_file_service.get_file_by_id(file_id)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    return await base_file_service.get_file_by_id(file_id)
 
 
 @router.delete("/remove-file/")
@@ -151,7 +122,4 @@ async def remove_file(
 ):
     base_file_service: BaseFileService = container.resolve(BaseFileService)
 
-    try:
-        return await base_file_service.delete_file(file_id)
-    except ValueError as e:
-        raise_http_error_from_exception(e)
+    return await base_file_service.delete_file(file_id)

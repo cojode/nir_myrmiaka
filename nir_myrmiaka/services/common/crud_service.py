@@ -3,8 +3,25 @@ from nir_myrmiaka.db.database import Database
 from nir_myrmiaka.db.repositories.crud.extended import ExtendedCRUDRepository
 from abc import ABC
 
+from nir_myrmiaka.exceptions.abc import DomainError
+
 T = TypeVar("T", bound="Base")
 R = TypeVar("T", bound="ExtendedCRUDRepository")
+
+
+class BaseCRUDServiceError(DomainError):
+    """Base exception class for CRUD service errors."""
+
+
+class EntityNotFoundError(BaseCRUDServiceError):
+    """Exception raised when an entity is not found."""
+
+    def __init__(self, entity_id: int):
+        super().__init__(
+            message="Entity not found",
+            detail={"entity_id": entity_id},
+        )
+        self.entity_id = entity_id
 
 
 class BaseCRUDService(ABC, Generic[T]):
@@ -15,7 +32,7 @@ class BaseCRUDService(ABC, Generic[T]):
     async def _get_model_by_id(self, id: int) -> dict:
         entity = await self.repo.find_by_id(id)
         if not entity:
-            raise ValueError(f"Entity with id [{id}] not found")
+            raise EntityNotFoundError(id)
         return entity.to_dict()
 
     async def _verify_model_exists(self, id: int) -> dict:
@@ -35,7 +52,7 @@ class BaseCRUDService(ABC, Generic[T]):
     async def _update_model(self, id: int, **kwargs) -> dict:
         entity = await self.repo.find_by_id(id)
         if not entity:
-            raise ValueError(f"Entity with id [{id}] not found")
+            raise EntityNotFoundError(id)
         for key, value in kwargs.items():
             setattr(entity, key, value)
         updated_entity = await self.repo.save(entity)
@@ -44,7 +61,7 @@ class BaseCRUDService(ABC, Generic[T]):
     async def _delete_model(self, id: int) -> None:
         entity = await self.repo.find_by_id(id)
         if not entity:
-            raise ValueError(f"Entity with id [{id}] not found")
+            raise EntityNotFoundError(id)
         await self.repo.delete(entity)
 
     async def _delete_models_by_filter(self, **kwargs) -> None:

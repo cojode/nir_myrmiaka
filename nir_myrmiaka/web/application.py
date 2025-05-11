@@ -7,6 +7,8 @@ from nir_myrmiaka.log import configure_logging
 from nir_myrmiaka.web.api.router import api_router
 from nir_myrmiaka.web.lifespan import lifespan_setup
 
+from nir_myrmiaka.web.middleware import application_exception_middleware
+
 
 def get_app() -> FastAPI:
     """
@@ -29,5 +31,6 @@ def get_app() -> FastAPI:
 
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api")
+    app.middleware("http")(application_exception_middleware)
 
     return app

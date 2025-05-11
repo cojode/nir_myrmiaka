@@ -1,5 +1,4 @@
 from typing import List, Optional, Any, Dict, TypeVar
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import asc, desc
 from nir_myrmiaka.db.repositories.crud import CRUDRepository
 
