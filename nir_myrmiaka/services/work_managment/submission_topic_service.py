@@ -81,39 +81,39 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
         self, submission_topic_id: int, comment: str
     ) -> dict:
         await self.comment_service.create_comment(comment, submission_topic_id)
-        submission = await self._affect_submission_topic(
+        submission_topic = await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,
             is_accepted=True,
         )
         await self.notification_service.notify_user(
-            submission.get("student_id"),
+            submission_topic.get("student_id"),
             NotificationType.SUBMISSION_TOPIC_ACCEPTED,
             "Your submission topic has been accepted.",
-            submission_topic_id,
-            NotificationEntityModelType.SUBMISSION_TOPIC,
+            submission_topic.get("submission_id"),
+            NotificationEntityModelType.SUBMISSION,
         )
 
-        return submission
+        return submission_topic
 
     async def decline_submission_topic(
         self, submission_topic_id: int, comment: str
     ) -> dict:
         await self.comment_service.create_comment(comment, submission_topic_id)
-        submission = await self._affect_submission_topic(
+        submission_topic = await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,
             is_accepted=False,
         )
         await self.notification_service.notify_user(
-            submission.get("student_id"),
+            submission_topic.get("student_id"),
             NotificationType.SUBMISSION_TOPIC_DECLINED,
             "Your submission topic has been declined.",
-            submission_topic_id,
-            NotificationEntityModelType.SUBMISSION_TOPIC,
+            submission_topic.get("submission_id"),
+            NotificationEntityModelType.SUBMISSION,
         )
 
-        return submission
+        return submission_topic
 
     async def review_submission_topic(self, submission_topic_id: int) -> dict:
         return await self._affect_submission_topic(
@@ -134,7 +134,7 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
             submission_topic.get("teacher_id"),
             NotificationType.SUBMISSION_TOPIC_FILE_ADDED,
             "A new file has been uploaded to your submission topic.",
-            base_file.get("id"),
-            NotificationEntityModelType.FILE,
+            submission_topic.get("submission_id"),
+            NotificationEntityModelType.SUBMISSION,
         )
         return base_file

@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, UploadFile, File
 
 from punq import Container
 from nir_myrmiaka.container.container import init_container
 
 from nir_myrmiaka.services.auth.auth_service import UserService
 from nir_myrmiaka.web.api.v1.schemas import UserUpdateRequest
+from nir_myrmiaka.services.work_managment.file_service import BaseFileService
+from nir_myrmiaka.services.work_managment.submission_topic_service import (
+    SubmissionTopicService,
+)
 
 from nir_myrmiaka.web.api.v1.exc import raise_http_error_from_exception
 
@@ -80,5 +84,49 @@ async def get_all_students(container: Container = Depends(init_container)):
             count=count,
             values=values,
         )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.post("/upload")
+async def upload_file(
+    submission_topic_id: int,
+    file: UploadFile = File(...),
+    container: Container = Depends(init_container),
+):
+    submission_topic_service: SubmissionTopicService = container.resolve(
+        SubmissionTopicService
+    )
+
+    try:
+        return await submission_topic_service.upload_related_file(
+            submission_topic_id=submission_topic_id, file=file
+        )
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.get("/download/{file_id}")
+async def get_file(
+    file_id: int,
+    container: Container = Depends(init_container),
+):
+    base_file_service: BaseFileService = container.resolve(BaseFileService)
+
+    try:
+        return await base_file_service.get_file_by_id(file_id)
+    except ValueError as e:
+        raise_http_error_from_exception(e)
+
+
+@router.delete("/remove-file/")
+async def remove_file(
+    file_id: int,
+    container: Container = Depends(init_container),
+):
+    base_file_service: BaseFileService = container.resolve(BaseFileService)
+
+    try:
+        return await base_file_service.delete_file(file_id)
     except ValueError as e:
         raise_http_error_from_exception(e)

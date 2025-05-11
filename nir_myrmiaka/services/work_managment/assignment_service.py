@@ -24,7 +24,7 @@ class AssignmentService(BaseCRUDService[BaseAssignment]):
     async def verify_student_no_active_assignment(self, user_id: int):
         user_profile = await self.verify_student(user_id)
         for assignment in user_profile.get("assignment_subordinate", []):
-            if assignment.is_accepted:
+            if assignment.get("is_accepted", None):
                 raise ValueError(
                     "Student has an accepted assignment; no new assignment allowed"
                 )
