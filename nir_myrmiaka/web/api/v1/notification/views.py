@@ -3,8 +3,6 @@ from fastapi import APIRouter, Depends, status
 from punq import Container
 from nir_myrmiaka.container.container import init_container
 
-from nir_myrmiaka.exceptions.abc import DomainError
-
 from nir_myrmiaka.services.notify.notify_service import NotificationService
 
 from nir_myrmiaka.web.api.v1.schemas import (
@@ -31,8 +29,4 @@ async def dismiss_notification(
         NotificationService
     )
     data = await notification_service.dismiss_notification(notification_id)
-    raise DomainError(
-        message="Notification not found",
-        detail=f"Notification with id {notification_id} not found",
-    )
     return NotificationResponse(data=data)
