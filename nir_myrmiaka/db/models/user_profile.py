@@ -1,4 +1,12 @@
-from sqlalchemy import ForeignKey, Index, Integer, String, DateTime, Text
+from sqlalchemy import (
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    DateTime,
+    Text,
+    Boolean,
+)
 from sqlalchemy.orm import mapped_column, relationship
 
 from nir_myrmiaka.db.base import Base
@@ -21,6 +29,8 @@ class UserProfile(Base):
     date_joined = mapped_column(DateTime)
     last_login = mapped_column(DateTime)
     role = mapped_column(String(20))
+
+    is_active = mapped_column(Boolean, default=False)
 
     about_me = mapped_column(Text)
 

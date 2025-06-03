@@ -103,12 +103,12 @@ class HeadlessUserProfileModel(BaseModel, from_attributes=True):
     middle_name: Optional[str] = None
     about_me: Optional[str] = None
     group_id: Optional[int] = None
+    is_active: Optional[bool] = None
 
 
 class UserUpdateRequest(BaseModel):
     target: IdField
     data: HeadlessUserProfileModel
-    zalupa: Optional[bool] = False
 
 class BaseUserProfileModel(HeadlessUserProfileModel):
     id: int
@@ -118,8 +118,7 @@ class BaseUserProfileModel(HeadlessUserProfileModel):
     role: Optional[str]
 
 
-class PlainUserProfileModel(BaseUserProfileModel):
-    group_id: Optional[int]
+class PlainUserProfileModel(BaseUserProfileModel): ...
 
 
 class BaseSubmissionModel(BaseModel):

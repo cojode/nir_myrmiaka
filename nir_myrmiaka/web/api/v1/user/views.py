@@ -52,7 +52,11 @@ async def get_user_notifications(
     return UserNotificationResponseModel(count=count, values=values)
 
 
-@router.patch("/set-info", status_code=status.HTTP_201_CREATED)
+@router.patch(
+    "/set-info",
+    status_code=status.HTTP_201_CREATED,
+    response_model=SetInfoResponse,
+)
 async def set_info_user(
     payload: UserUpdateRequest,
     container: Container = Depends(init_container),
