@@ -42,6 +42,9 @@ class AssignmentService(BaseCRUDService[BaseAssignment]):
         super().__init__(db, BaseAssignmentRepository)
         self.user_service = user_service
 
+    async def delete_assignment(self, assignment_id: int):
+        await self._delete_model(assignment_id)
+
     async def verify_student(self, user_id: int):
         return await self.user_service.verify_exists_and_role_specified(
             user_id=user_id, role=self._student_role_symbolic

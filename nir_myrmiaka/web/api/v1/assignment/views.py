@@ -27,6 +27,20 @@ async def get_assignment(
     )
 
 
+@router.delete(
+    "/{assignment_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_assignment(
+    assignment_id: int, container: Container = Depends(init_container)
+):
+    assignment_service: AssignmentService = container.resolve(
+        AssignmentService
+    )
+
+    await assignment_service.delete_assignment(assignment_id)
+
+
 @router.get(
     "/{assignment_id}/submissions",
     status_code=status.HTTP_200_OK,
