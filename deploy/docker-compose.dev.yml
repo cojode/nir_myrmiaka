@@ -2,12 +2,12 @@ services:
   api:
     ports:
       # Exposes application port.
-      - "8000:8000"
+      - "8100:8000"
     build:
       context: .
-    volumes:
+    #volumes:
       # Adds current directory as volume.
-      - .:/app/
+    #  - .:/app/
     environment:
       # Enables autoreload.
       NIR_MYRMIAKA_RELOAD: "True"

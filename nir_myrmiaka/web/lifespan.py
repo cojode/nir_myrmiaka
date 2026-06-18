@@ -17,8 +17,19 @@ from nir_myrmiaka.db.models.base_researchwork import BaseResearchwork
 from nir_myrmiaka.db.models.base_topic import BaseTopic
 
 from nir_myrmiaka.db.database import Database
+from nir_myrmiaka.services.cdn.minio_async import AsyncMinIOClient
 
 from nir_myrmiaka.settings import settings
+
+from nir_myrmiaka.log import logger
+
+
+async def _check_minio_connectivity() -> None:
+    logger.info("Checking CDN availabilty...")
+    client = AsyncMinIOClient()
+    if not await client.check_connection():
+        raise RuntimeError("CDN is not accessible")
+    logger.info("CDN is available")
 
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover
@@ -122,6 +133,7 @@ async def lifespan_setup(
     """
 
     app.middleware_stack = None
+    await _check_minio_connectivity()
     _setup_db(app)
     load_all_models()
     await create_tables()

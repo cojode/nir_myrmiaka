@@ -1,37 +1,28 @@
-FROM python:3.11.4-slim-bullseye as prod
+FROM python:bookworm as prod
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install poetry==1.8.2
+RUN pip install uv
 
-# Configure Poetry
-RUN poetry config virtualenvs.create false
-RUN poetry config cache-dir /tmp/poetry_cache
+ENV UV_NO_VENV=1
+ENV UV_CACHE_DIR=/tmp/uv_cache
 
-# Set working directory and copy files
 WORKDIR /app
-COPY pyproject.toml poetry.lock ./
 
-# Install main dependencies (including your package in editable mode)
-RUN --mount=type=cache,target=/tmp/poetry_cache \
-    poetry install --only main --no-interaction --no-ansi
+COPY pyproject.toml uv.lock ./
 
-# Copy application code
+RUN --mount=type=cache,target=/tmp/uv_cache \
+    uv sync --no-dev --no-install-project --no-editable
+
 COPY . .
 
-# Make entrypoint executable
-RUN chmod +x entrypoint.sh
+RUN uv sync --no-dev --no-editable
 
-# Set PYTHONPATH to ensure package discovery
 ENV PYTHONPATH=/app
 
-# Entrypoint and command (run through Poetry)
-ENTRYPOINT ["sh", "entrypoint.sh"]
-CMD ["poetry", "run", "python", "-m", "nir_myrmiaka"]
+CMD ["uv", "run", "python", "-m", "nir_myrmiaka"]
 
 FROM prod as dev
-# Install dev dependencies
-RUN --mount=type=cache,target=/tmp/poetry_cache \
-    poetry install --no-interaction --no-ansi
+
+RUN --mount=type=cache,target=/tmp/uv_cache \
+    uv sync --no-install-project --no-editable
