@@ -218,6 +218,7 @@ class BaseCommentModel(BaseModel):
     comment: Optional[str]
     is_reviewed: bool
     created_at: Optional[datetime.datetime]
+    user_id: int
 
 
 class PlainCommentModel(BaseCommentModel):

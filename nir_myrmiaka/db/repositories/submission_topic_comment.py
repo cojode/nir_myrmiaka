@@ -12,6 +12,14 @@ class SubmissionTopicCommentRepository(
     def __init__(self, session):
         super().__init__(session, SubmissionTopicComment)
 
+    async def get_comments_by_submission_topic_id(
+        self,
+        submission_topic_id: int,
+    ):
+        return await self.find_all(
+            submission_topic_id=submission_topic_id
+        )
+
     async def review_comments_by_submission_topic_id(
         self,
         submission_topic_id: int,

@@ -78,9 +78,9 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
         return await self._update_model(submission_topic_id, **update_data)
 
     async def accept_submission_topic(
-        self, submission_topic_id: int, comment: str
+        self, submission_topic_id: int, comment: str, user_id: int
     ) -> dict:
-        await self.comment_service.create_comment(comment, submission_topic_id)
+        await self.comment_service.create_comment(comment, submission_topic_id, user_id)
         submission_topic = await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,
@@ -105,9 +105,9 @@ class SubmissionTopicService(BaseCRUDService[SubmissionTopic]):
         return submission_topic
 
     async def decline_submission_topic(
-        self, submission_topic_id: int, comment: str
+        self, submission_topic_id: int, comment: str, user_id: int
     ) -> dict:
-        await self.comment_service.create_comment(comment, submission_topic_id)
+        await self.comment_service.create_comment(comment, submission_topic_id, user_id)
         submission_topic = await self._affect_submission_topic(
             submission_topic_id=submission_topic_id,
             is_reviewed=True,

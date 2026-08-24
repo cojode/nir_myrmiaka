@@ -37,6 +37,7 @@ class AffectSubmissionTopicRequest(BaseModel):
 
 class AffectSubmissionTopicRequestWithComment(AffectSubmissionTopicRequest):
     comment: str
+    teacher_id: int
 
 
 class AcceptSubmissionTopicResponse(

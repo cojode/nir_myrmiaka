@@ -5,6 +5,7 @@ from nir_myrmiaka.web.api.v1.schemas import (
     GenericResponse,
     SubmissionResponseModel,
     SubmissionTopicResponseModel,
+    PlainCommentModel,
 )
 
 
@@ -23,3 +24,20 @@ class EditSubmissionRequest(BaseModel):
 class SubmissionTopicsResponse(
     GenericListResponse[SubmissionTopicResponseModel]
 ): ...
+
+
+class CreateCommentRequest(BaseModel):
+    submission_topic_id: int
+    user_id: int
+    comment: str
+
+
+class EditCommentRequest(BaseModel):
+    user_id: int
+    comment: str
+
+
+class CommentResponse(GenericResponse[PlainCommentModel]): ...
+
+
+class CommentsListResponse(GenericListResponse[PlainCommentModel]): ...

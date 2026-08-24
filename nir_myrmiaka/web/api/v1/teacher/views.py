@@ -143,7 +143,7 @@ async def accept_submission_topic(
     )
     return AcceptSubmissionTopicResponse(
         data=await work_management_service.accept_submission_topic(
-            payload.submission_topic_id, payload.comment
+            payload.submission_topic_id, payload.comment, payload.teacher_id
         )
     )
 
@@ -162,7 +162,7 @@ async def decline_submission_topic(
 
     return DeclineSubmissionTopicResponse(
         data=await work_management_service.decline_submission_topic(
-            payload.submission_topic_id, payload.comment
+            payload.submission_topic_id, payload.comment, payload.teacher_id
         )
     )
 

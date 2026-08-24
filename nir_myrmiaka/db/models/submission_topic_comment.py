@@ -17,9 +17,19 @@ class SubmissionTopicComment(Base):
         ForeignKey("submission_topic.id"), nullable=False
     )
 
+    user_id = mapped_column(
+        ForeignKey("user_profile.id"), nullable=False
+    )
+
     submission_topic = relationship(
         "SubmissionTopic",
         back_populates="comments",
         lazy="joined",
         foreign_keys=[submission_topic_id],
+    )
+
+    user = relationship(
+        "UserProfile",
+        lazy="joined",
+        foreign_keys=[user_id],
     )
