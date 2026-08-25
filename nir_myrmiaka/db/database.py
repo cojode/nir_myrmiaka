@@ -9,9 +9,9 @@ class Database:
     def __init__(self, url: str, ro_url: str) -> None:
         self._async_engine = create_async_engine(
             url=url,
-            pool_pre_ping=False,
+            pool_pre_ping=True,
             # echo=False,
-            isolation_level="AUTOCOMMIT",
+            connect_args={"timeout": 30},
         )
         self._async_session = async_sessionmaker(
             bind=self._async_engine,
@@ -20,9 +20,9 @@ class Database:
 
         self._read_only_async_engine = create_async_engine(
             url=ro_url,
-            pool_pre_ping=False,
+            pool_pre_ping=True,
             # echo=False,
-            isolation_level="AUTOCOMMIT",
+            connect_args={"timeout": 30},
         )
         self._read_only_async_session = async_sessionmaker(
             bind=self._read_only_async_engine,

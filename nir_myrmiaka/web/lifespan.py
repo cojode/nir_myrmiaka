@@ -18,6 +18,7 @@ from nir_myrmiaka.db.models.base_topic import BaseTopic
 
 from nir_myrmiaka.db.database import Database
 from nir_myrmiaka.services.cdn.minio_async import AsyncMinIOClient
+from nir_myrmiaka.container.container import init_container
 
 from nir_myrmiaka.settings import settings
 
@@ -32,33 +33,11 @@ async def _check_minio_connectivity() -> None:
     logger.info("CDN is available")
 
 
-def _setup_db(app: FastAPI) -> None:  # pragma: no cover
-    """
-    Creates connection to the database.
-
-    This function creates SQLAlchemy engine instance,
-    session_factory for creating sessions
-    and stores them in the application's state property.
-
-    :param app: fastAPI application.
-    """
-    engine = create_async_engine(str(settings.db_url), echo=settings.db_echo)
-    session_factory = async_sessionmaker(
-        engine,
-        expire_on_commit=False,
-    )
-    app.state.db_engine = engine
-    app.state.db_session_factory = session_factory
-
-async def create_tables(
-    db_url: str = settings.db_url,
-) -> None:  # pragma: no cover
+async def create_tables(db: Database) -> None:  # pragma: no cover
     """Populates tables in the database."""
-    db = Database(str(db_url), str(db_url))
     async with db._async_engine.begin() as connection:
         await connection.run_sync(meta.create_all)
         await fill_tables(db)
-    await db._async_engine.dispose()
 
 
 async def fill_tables(db: Database):
@@ -134,11 +113,16 @@ async def lifespan_setup(
 
     app.middleware_stack = None
     await _check_minio_connectivity()
-    _setup_db(app)
+
+    container = init_container()
+    db: Database = container.resolve(Database)
+    app.state.db = db
+
     load_all_models()
-    await create_tables()
+    await create_tables(db)
 
     app.middleware_stack = app.build_middleware_stack()
 
     yield
-    await app.state.db_engine.dispose()
+    await db._async_engine.dispose()
+    await db._read_only_async_engine.dispose()
