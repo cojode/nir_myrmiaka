@@ -24,6 +24,16 @@ class RegisterEssentials(PasswordMixinSchema, UsernameField): ...
 class LoginEssentials(UsernameField, PasswordMixinSchema): ...
 
 
+class CasLoginRequest(BaseModel):
+    """CAS login request body — ticket + callback path."""
+
+    ticket: str = Field(..., description="One-time CAS service ticket (ST-...)")
+    service: str = Field(
+        ...,
+        description="CAS callback path, e.g. /api/v1/auth/cas/callback",
+    )
+
+
 class UserProfileCreateRequestModel(HeadlessUserUpdateRequest):
     role: Optional[str] = Field(max_length=20)
 

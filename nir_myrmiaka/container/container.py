@@ -24,6 +24,7 @@ from nir_myrmiaka.services import (
     NotificationService,
     NotificationEntityService,
     UsersGroupService,
+    CasService,
 )
 from nir_myrmiaka.settings import settings
 from nir_myrmiaka.db.database import Database
@@ -74,5 +75,6 @@ def _init_container() -> Container:
     container.register(NotificationService, scope=Scope.singleton)
     container.register(NotificationEntityService, scope=Scope.singleton)
     container.register(UsersGroupService, scope=Scope.singleton)
+    container.register(CasService, scope=Scope.singleton)
 
     return container

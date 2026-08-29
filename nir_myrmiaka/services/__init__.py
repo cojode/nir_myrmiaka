@@ -1,6 +1,7 @@
 """Services for nir_myrmiaka."""
 
 from nir_myrmiaka.services.auth.auth_service import UserService
+from nir_myrmiaka.services.auth.cas_service import CasService
 from nir_myrmiaka.services.work_managment.assignment_service import (
     AssignmentService,
 )
@@ -33,6 +34,7 @@ from nir_myrmiaka.services.notify.notify_service import (
 
 __all__ = [
     "UserService",
+    "CasService",
     "AssignmentService",
     "ResearchworkService",
     "SubmissionService",

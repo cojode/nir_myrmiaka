@@ -58,6 +58,12 @@ class Settings(BaseSettings):
     def minio_endpoint(self) -> str:
         return f"http://{self.minio_host}"
 
+    # CAS server URL for external authentication
+    cas_server_url: str = "https://auth.mephi.ru"
+
+    # Public base URL of this backend (used to form full service callback URL)
+    cas_public_base_url: str = "http://77.91.93.10:8000"
+
     @property
     def db_url(self) -> URL:
         """
