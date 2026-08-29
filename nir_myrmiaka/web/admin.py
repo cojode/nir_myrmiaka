@@ -58,7 +58,7 @@ class AdminAuth(AuthenticationBackend):
                 return False
             if not verify_password(str(password), user.password):
                 return False
-            if user.id != settings.admin_user_id:
+            if user.id not in settings.admin_user_ids:
                 return False
 
             request.session.update({"user_id": user.id})
@@ -72,7 +72,7 @@ class AdminAuth(AuthenticationBackend):
         user_id = request.session.get("user_id")
         if user_id is None:
             return False
-        return user_id == settings.admin_user_id
+        return user_id in settings.admin_user_ids
 
 # ---------------------------------------------------------------------------
 # Model views – full CRUD access to every field

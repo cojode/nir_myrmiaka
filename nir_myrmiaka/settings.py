@@ -34,8 +34,8 @@ class Settings(BaseSettings):
     # Enable uvicorn reloading
     reload: bool = True
 
-    # Admin user ID — only this user can access /admin
-    admin_user_id: int = 1
+    # Admin user IDs — only these users can access /admin (empty = nobody)
+    admin_user_ids: list[int] = []
 
     # Secret key for session middleware (used by admin panel)
     session_secret_key: str = "change-me-in-production-settings"
