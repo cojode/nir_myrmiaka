@@ -64,6 +64,12 @@ class AdminAuth(AuthenticationBackend):
         request.session.clear()
         return True
 
+    async def authenticate(self, request: Request) -> bool:
+        user_id = request.session.get("user_id")
+        if user_id is None:
+            return False
+        return user_id == settings.admin_user_id
+
 # ---------------------------------------------------------------------------
 # Model views – full CRUD access to every field
 # ---------------------------------------------------------------------------
