@@ -37,14 +37,14 @@ class UserProfile(Base):
     group_id = mapped_column(ForeignKey("users_group.id"))
 
     group = relationship(
-        "UsersGroup", back_populates="user_profile", lazy="joined"
+        "UsersGroup", back_populates="user_profile", lazy="selectin"
     )
 
     notifications = relationship(
         "Notification",
         uselist=True,
         back_populates="user",
-        lazy="joined",
+        lazy="selectin",
     )
 
     assignment_subordinate = relationship(
@@ -52,7 +52,7 @@ class UserProfile(Base):
         uselist=True,
         foreign_keys="[BaseAssignment.student_id]",
         back_populates="student",
-        lazy="joined",
+        lazy="selectin",
     )
 
     assignment_supervisor = relationship(
@@ -60,5 +60,5 @@ class UserProfile(Base):
         uselist=True,
         foreign_keys="[BaseAssignment.teacher_id]",
         back_populates="teacher",
-        lazy="joined",
+        lazy="selectin",
     )

@@ -22,17 +22,17 @@ class BaseAssignment(Base):
         "UserProfile",
         foreign_keys=[student_id],
         back_populates="assignment_subordinate",
-        lazy="joined",
+        lazy="selectin",
     )
     teacher = relationship(
         "UserProfile",
         foreign_keys=[teacher_id],
         back_populates="assignment_supervisor",
-        lazy="joined",
+        lazy="selectin",
     )
     submissions = relationship(
         "BaseSubmission",
         uselist=True,
         back_populates="assignment",
-        lazy="joined",
+        lazy="selectin",
     )

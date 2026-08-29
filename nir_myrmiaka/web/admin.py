@@ -25,6 +25,14 @@ from nir_myrmiaka.settings import settings
 
 
 # ---------------------------------------------------------------------------
+# Synchronous engine shared across the admin panel (created once).
+# ---------------------------------------------------------------------------
+_sync_url = f"sqlite:///{settings.db_file}"
+_sync_engine = create_engine(_sync_url, connect_args={"check_same_thread": False})
+_sync_session_factory = sessionmaker(bind=_sync_engine)
+
+
+# ---------------------------------------------------------------------------
 # Authentication backend – username + password, admin-only by ID
 # ---------------------------------------------------------------------------
 
@@ -40,11 +48,7 @@ class AdminAuth(AuthenticationBackend):
         if not username or not password:
             return False
 
-        sync_url = f"sqlite:///{settings.db_file}"
-        engine = create_engine(sync_url)
-        session_factory = sessionmaker(bind=engine)
-
-        with session_factory() as session:
+        with _sync_session_factory() as session:
             user = (
                 session.query(UserProfile)
                 .filter(UserProfile.username == str(username))
@@ -81,6 +85,7 @@ class UserProfileAdmin(ModelView, model=UserProfile):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class UsersGroupAdmin(ModelView, model=UsersGroup):
@@ -89,6 +94,7 @@ class UsersGroupAdmin(ModelView, model=UsersGroup):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class UserGroupTermAdmin(ModelView, model=UserGroupTerm):
@@ -97,6 +103,7 @@ class UserGroupTermAdmin(ModelView, model=UserGroupTerm):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class BaseAssignmentAdmin(ModelView, model=BaseAssignment):
@@ -105,6 +112,7 @@ class BaseAssignmentAdmin(ModelView, model=BaseAssignment):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class BaseFileAdmin(ModelView, model=BaseFile):
@@ -113,6 +121,7 @@ class BaseFileAdmin(ModelView, model=BaseFile):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class BaseResearchworkAdmin(ModelView, model=BaseResearchwork):
@@ -121,6 +130,7 @@ class BaseResearchworkAdmin(ModelView, model=BaseResearchwork):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class BaseSubmissionAdmin(ModelView, model=BaseSubmission):
@@ -129,6 +139,7 @@ class BaseSubmissionAdmin(ModelView, model=BaseSubmission):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class BaseTopicAdmin(ModelView, model=BaseTopic):
@@ -137,6 +148,7 @@ class BaseTopicAdmin(ModelView, model=BaseTopic):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class SubmissionTopicAdmin(ModelView, model=SubmissionTopic):
@@ -145,6 +157,7 @@ class SubmissionTopicAdmin(ModelView, model=SubmissionTopic):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class SubmissionTopicCommentAdmin(ModelView, model=SubmissionTopicComment):
@@ -153,6 +166,7 @@ class SubmissionTopicCommentAdmin(ModelView, model=SubmissionTopicComment):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class NotificationAdmin(ModelView, model=Notification):
@@ -161,6 +175,7 @@ class NotificationAdmin(ModelView, model=Notification):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 class NotificationEntityAdmin(ModelView, model=NotificationEntity):
@@ -169,6 +184,7 @@ class NotificationEntityAdmin(ModelView, model=NotificationEntity):
     can_delete = True
     can_view_details = True
     column_list = "__all__"
+    page_size = 25
 
 
 # ---------------------------------------------------------------------------
@@ -179,17 +195,14 @@ class NotificationEntityAdmin(ModelView, model=NotificationEntity):
 def setup_admin(app: FastAPI) -> SQLAdmin:
     """Attach SQLAdmin dashboard to *app* and return the admin instance."""
 
-    sync_url = f"sqlite:///{settings.db_file}"
-    engine = create_engine(sync_url, connect_args={"check_same_thread": False})
-
     auth_backend = AdminAuth(secret_key=settings.session_secret_key)
 
     admin = SQLAdmin(
         app=app,
-        engine=engine,
+        engine=_sync_engine,
         authentication_backend=auth_backend,
         base_url="/admin",
-        title="NIR Myrmiaka Admin",
+        title="NIR Admin",
     )
 
     admin.add_view(UserProfileAdmin)

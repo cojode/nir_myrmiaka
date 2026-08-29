@@ -5,8 +5,10 @@ from sqlalchemy import (
     update as sql_update,
     delete as sql_delete,
     Select,
+    inspect as sa_inspect,
 )
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import selectinload
 
 from nir_myrmiaka.db.database import Database
 from nir_myrmiaka.exceptions.abc import RepositoryError
@@ -110,6 +112,16 @@ class CRUDRepository(AbstractCRUDRepository[T]):
         """
         try:
             query = sql_select(self.model).filter_by(**filters)
+
+            # Eager-load all selectin-lazy relationships so to_dict()
+            # sees them even after the session is closed.
+            mapper = sa_inspect(self.model)
+            for rel in mapper.relationships:
+                if rel.lazy == "selectin":
+                    query = query.options(
+                        selectinload(getattr(self.model, rel.key)),
+                    )
+
             if order_by is not None:
                 query = query.order_by(order_by)
             if limit is not None:

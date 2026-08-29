@@ -25,12 +25,12 @@ class BaseSubmission(Base):
         "SubmissionTopic",
         uselist=True,
         back_populates="submission",
-        lazy="joined",
+        lazy="selectin",
     )
 
     assignment = relationship(
-        "BaseAssignment", back_populates="submissions", lazy="joined"
+        "BaseAssignment", back_populates="submissions", lazy="selectin"
     )
     research_work = relationship(
-        "BaseResearchwork", back_populates="submissions", lazy="joined"
+        "BaseResearchwork", back_populates="submissions", lazy="selectin"
     )

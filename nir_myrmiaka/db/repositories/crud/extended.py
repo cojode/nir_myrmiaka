@@ -1,5 +1,5 @@
 from typing import List, Optional, Any, Dict, TypeVar
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, func, select as sql_select
 from nir_myrmiaka.db.repositories.crud import CRUDRepository
 
 T = TypeVar("T")
@@ -20,17 +20,25 @@ class ExtendedCRUDRepository(CRUDRepository[T]):
 
     async def count_all(self) -> int:
         """
-        Count all entities in the model.
+        Count all entities in the model (lightweight SQL COUNT).
         """
-        entities = await self.find_all()
-        return len(entities)
+        query = sql_select(func.count()).select_from(self.model)
+        async with self.database.get_read_only_session() as session:
+            result = await session.execute(query)
+            return result.scalar() or 0
 
     async def count_by_filter(self, **filters) -> int:
         """
-        Count entities matching specific filters.
+        Count entities matching specific filters (lightweight SQL COUNT).
         """
-        entities = await self.find_all(**filters)
-        return len(entities)
+        query = (
+            sql_select(func.count())
+            .select_from(self.model)
+            .filter_by(**filters)
+        )
+        async with self.database.get_read_only_session() as session:
+            result = await session.execute(query)
+            return result.scalar() or 0
 
     async def find_and_count(self, **filters) -> dict:
         values = await self.find_all(**filters)

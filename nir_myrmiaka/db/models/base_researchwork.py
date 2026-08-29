@@ -20,11 +20,11 @@ class BaseResearchwork(Base):
         "BaseTopic",
         uselist=True,
         back_populates="research_work",
-        lazy="joined",
+        lazy="selectin",
     )
     submissions = relationship(
         "BaseSubmission",
         uselist=True,
         back_populates="research_work",
-        lazy="joined",
+        lazy="selectin",
     )

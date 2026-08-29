@@ -25,20 +25,20 @@ class SubmissionTopic(Base):
         "SubmissionTopicComment",
         back_populates="submission_topic",
         foreign_keys="[SubmissionTopicComment.submission_topic_id]",
-        lazy="joined",
+        lazy="selectin",
         cascade="all, delete-orphan",
     )
 
     submission = relationship(
-        "BaseSubmission", back_populates="submission_topics", lazy="joined"
+        "BaseSubmission", back_populates="submission_topics", lazy="selectin"
     )
     topic = relationship(
-        "BaseTopic", back_populates="submission_topics", lazy="joined"
+        "BaseTopic", back_populates="submission_topics", lazy="selectin"
     )
 
     files = relationship(
         "BaseFile",
         uselist=True,
         back_populates="submission_topic",
-        lazy="joined",
+        lazy="selectin",
     )

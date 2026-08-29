@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
     # Variables for the database
     db_file: Path = TEMP_DIR / "db.sqlite3"
-    db_echo: bool = True
+    db_echo: bool = False
 
     @property
     def minio_endpoint(self) -> str:

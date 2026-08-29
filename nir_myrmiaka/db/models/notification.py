@@ -39,7 +39,7 @@ class NotificationEntity(Base):
     entity_model = mapped_column(Enum(NotificationEntityModelType))
 
     notification = relationship(
-        "Notification", back_populates="entities", lazy="joined"
+        "Notification", back_populates="entities", lazy="selectin"
     )
 
 
@@ -54,8 +54,8 @@ class Notification(Base):
     created_at = mapped_column(DateTime, default=datetime.now)
 
     entities = relationship(
-        "NotificationEntity", back_populates="notification", lazy="joined"
+        "NotificationEntity", back_populates="notification", lazy="selectin"
     )
     user = relationship(
-        "UserProfile", back_populates="notifications", lazy="joined"
+        "UserProfile", back_populates="notifications", lazy="selectin"
     )

@@ -24,12 +24,12 @@ class SubmissionTopicComment(Base):
     submission_topic = relationship(
         "SubmissionTopic",
         back_populates="comments",
-        lazy="joined",
+        lazy="selectin",
         foreign_keys=[submission_topic_id],
     )
 
     user = relationship(
         "UserProfile",
-        lazy="joined",
+        lazy="selectin",
         foreign_keys=[user_id],
     )

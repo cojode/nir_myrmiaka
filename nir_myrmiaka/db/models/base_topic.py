@@ -14,9 +14,9 @@ class BaseTopic(Base):
     research_work_id = mapped_column(ForeignKey("base_researchwork.id"))
 
     research_work = relationship(
-        "BaseResearchwork", back_populates="base_topics"
+        "BaseResearchwork", back_populates="base_topics", lazy="selectin"
     )
 
     submission_topics = relationship(
-        "SubmissionTopic", uselist=True, back_populates="topic"
+        "SubmissionTopic", uselist=True, back_populates="topic", lazy="selectin"
     )

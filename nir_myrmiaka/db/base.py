@@ -24,7 +24,7 @@ class Base(DeclarativeBase):
             else:
                 data[attr.key] = None
 
-        logger.info(f"Converted model {self} to dict")
+        logger.debug(f"Converted model {self} to dict")
         return data
 
     def to_plain_dict(self) -> Dict[str, Any]:
