@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     # Enable uvicorn reloading
     reload: bool = True
 
+    # Admin user ID — only this user can access /admin
+    admin_user_id: int = 1
+
+    # Secret key for session middleware (used by admin panel)
+    session_secret_key: str = "change-me-in-production-settings"
+
     minio_host: str = "localhost:9000"
     minio_access_key: str = "minioadmin"
     minio_secret_key: str = "minioadmin"

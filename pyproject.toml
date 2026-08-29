@@ -24,6 +24,9 @@ dependencies = [
     "aiofiles<25.0.0,>=24.1.0",
     "bs4<1.0.0,>=0.0.2",
     "bcrypt==4.3.0",
+    "sqladmin>=0.24.0",
+    "itsdangerous>=2.0.0",
+    "itsdangerous>=2.2.0",
 ]
 name = "nir_myrmiaka"
 version = "0.1.0"
