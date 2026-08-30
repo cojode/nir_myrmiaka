@@ -10,9 +10,13 @@ class GroupParser:
     def __init__(self, current_term: str | None = None):
         self.current_term = current_term
 
-    async def get_groups(self):
+    async def get_groups(self, level: int = 0):
+        params = {}
+        if level != 0:
+            params["level"] = level
+
         async with aiohttp.ClientSession() as client:
-            response = await client.get(self.__resource)
+            response = await client.get(self.__resource, params=params)
             if response.status == 200:
 
                 actual_current_term = str(

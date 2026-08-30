@@ -47,16 +47,30 @@ async def fill_tables(db: Database):
         # * Groups
         saved_term = await session.execute(select(UserGroupTerm).limit(1))
         saved_term = saved_term.scalar()
-        actual_term, groups_to_add = await GroupParser(
+        parser = GroupParser(
             None if not saved_term else saved_term.term
-        ).get_groups()
+        )
+        actual_term, groups_to_add = await parser.get_groups(level=0)
 
         if groups_to_add:
             print("Adding groups...")
+
+            # Собираем группы со всех уровней (0 уже получен)
+            all_groups: list[str] = list(groups_to_add)
+            seen: set[str] = set(groups_to_add)
+
+            for level in (1, 2, 3):
+                _, extra_groups = await parser.get_groups(level=level)
+                if extra_groups:
+                    for name in extra_groups:
+                        if name not in seen:
+                            seen.add(name)
+                            all_groups.append(name)
+
             await session.execute(delete(UsersGroup))
             await session.execute(delete(UserGroupTerm))
             session.add_all(
-                [UsersGroup(group_name=name) for name in groups_to_add]
+                [UsersGroup(group_name=name) for name in all_groups]
             )
             session.add(UserGroupTerm(term=actual_term))
             await session.commit()
