@@ -21,3 +21,6 @@ class BaseFile(Base):
     submission_topic = relationship(
         "SubmissionTopic", back_populates="files", lazy="selectin"
     )
+
+    def __str__(self) -> str:
+        return self.original_filename or f"File #{self.id}"

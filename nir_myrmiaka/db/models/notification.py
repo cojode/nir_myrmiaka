@@ -42,6 +42,9 @@ class NotificationEntity(Base):
         "Notification", back_populates="entities", lazy="selectin"
     )
 
+    def __str__(self) -> str:
+        return f"Entity #{self.id} ({self.entity_model}:{self.entity_id})"
+
 
 class Notification(Base):
     __tablename__ = "notifications"
@@ -59,3 +62,7 @@ class Notification(Base):
     user = relationship(
         "UserProfile", back_populates="notifications", lazy="selectin"
     )
+
+    def __str__(self) -> str:
+        snippet = (self.message or "")[:60]
+        return f"Notification #{self.id} [{self.type}]: {snippet}"

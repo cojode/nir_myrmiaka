@@ -28,3 +28,6 @@ class BaseResearchwork(Base):
         back_populates="research_work",
         lazy="selectin",
     )
+
+    def __str__(self) -> str:
+        return self.name

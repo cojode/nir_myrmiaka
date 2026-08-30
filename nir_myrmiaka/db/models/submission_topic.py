@@ -42,3 +42,6 @@ class SubmissionTopic(Base):
         back_populates="submission_topic",
         lazy="selectin",
     )
+
+    def __str__(self) -> str:
+        return f"SubmissionTopic #{self.id}"

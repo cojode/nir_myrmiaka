@@ -34,3 +34,6 @@ class BaseSubmission(Base):
     research_work = relationship(
         "BaseResearchwork", back_populates="submissions", lazy="selectin"
     )
+
+    def __str__(self) -> str:
+        return self.submission_title or f"Submission #{self.id}"

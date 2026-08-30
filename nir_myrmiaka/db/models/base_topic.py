@@ -20,3 +20,6 @@ class BaseTopic(Base):
     submission_topics = relationship(
         "SubmissionTopic", uselist=True, back_populates="topic", lazy="selectin"
     )
+
+    def __str__(self) -> str:
+        return self.name

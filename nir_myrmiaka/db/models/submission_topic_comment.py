@@ -33,3 +33,7 @@ class SubmissionTopicComment(Base):
         lazy="selectin",
         foreign_keys=[user_id],
     )
+
+    def __str__(self) -> str:
+        snippet = (self.comment or "")[:50]
+        return f"Comment #{self.id}: {snippet}"

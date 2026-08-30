@@ -62,3 +62,7 @@ class UserProfile(Base):
         back_populates="teacher",
         lazy="selectin",
     )
+
+    def __str__(self) -> str:
+        name = f"{self.last_name} {self.first_name}".strip()
+        return f"{name} (@{self.username})" if name else self.username

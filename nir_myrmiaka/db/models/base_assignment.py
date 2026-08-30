@@ -36,3 +36,6 @@ class BaseAssignment(Base):
         back_populates="assignment",
         lazy="selectin",
     )
+
+    def __str__(self) -> str:
+        return f"Assignment #{self.id}"
