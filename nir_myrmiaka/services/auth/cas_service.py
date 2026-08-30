@@ -145,7 +145,7 @@ class CasService:
         new_user = await self.repo.create(
             username=username,
             password=hash_password(random_password),
-            role="Student",
+            role="Unknown",
             is_active=True,
             date_joined=now,
             last_login=now,
